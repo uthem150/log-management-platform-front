@@ -1,0 +1,30 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "loginSuccess": "Login Successful!",
+    "signupSuccess": "Sign Up Successful!"
+  },
+  "home": {
+    "welcome": "Welcome",
+    "description": "This project is a boilerplate using Vite, React, and TypeScript."
+  },
+  "about": {
+    "title": "About Page",
+    "description": "This page provides information about the app."
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for doesn't exist.",
+    "goBack": "Go Back to Home"
+  }
+}
