@@ -4,27 +4,91 @@
     "about": "About",
     "login": "Login",
     "signup": "Sign Up",
-    "logout": "Logout"
+    "logout": "Logout",
+    "profile": "Profile",
+    "projects": "Projects",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "saving": "Saving...",
+    "maximize": "Maximize",
+    "minimize": "Minimize"
   },
+
   "auth": {
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
     "forgotPassword": "Forgot Password?",
     "loginSuccess": "Login Successful!",
-    "signupSuccess": "Sign Up Successful!"
+    "signupSuccess": "Signup Successful!"
   },
+
   "home": {
     "welcome": "Welcome",
-    "description": "This project is a boilerplate using Vite, React, and TypeScript."
+    "description": "This is a boilerplate project using Vite, React, and TypeScript."
   },
+
   "about": {
     "title": "About Page",
-    "description": "This page provides information about the app."
+    "description": "This provides information about this app."
   },
+
   "notFound": {
     "title": "Page Not Found",
-    "description": "The page you are looking for doesn't exist.",
-    "goBack": "Go Back to Home"
+    "description": "The page you requested does not exist.",
+    "goBack": "Go Home"
+  },
+
+  "projects": {
+    "title": "My Projects",
+    "description": "Manage logs from various cloud platforms in a centralized way.",
+    "createNew": "Create New Project",
+    "noProjects": "No Projects Found",
+    "createFirstProject": "Create your first project!",
+    "name": "Project Name",
+    "description": "Description",
+    "namePlaceholder": "Enter project name",
+    "descriptionPlaceholder": "Enter project description",
+    "create": "Create Project",
+    "creating": "Creating...",
+    "createSuccess": "Project created successfully!",
+    "createError": "Error creating project",
+    "edit": "Edit Project",
+    "updateSuccess": "Project updated successfully!",
+    "updateError": "Error updating project",
+    "deleteSuccess": "Project deleted successfully!",
+    "deleteError": "Error deleting project",
+    "confirmDelete": "Are you sure you want to delete this project?",
+    "details": "Project Details",
+    "id": "Project ID",
+    "created": "Created",
+    "updated": "Updated",
+    "owner": "Owner",
+    "status": "Status",
+    "noDescription": "No description provided",
+    "dashboard": "Dashboard",
+    "noDashboard": "No dashboard connected to this project.",
+    "generateDashboard": "Generate Dashboard",
+    "generatingDashboard": "Generating Dashboard...",
+    "regenerateDashboard": "Regenerate Dashboard",
+    "regenerating": "Regenerating...",
+    "dashboardSuccess": "Dashboard generated successfully!",
+    "dashboardError": "Error generating dashboard",
+    "dashboardReady": "Dashboard is ready.",
+    "openDashboard": "Open Dashboard",
+    "openInNewTab": "Open in New Tab",
+    "backToList": "Back to List",
+    "notFound": "Project not found.",
+    "needLogin": "Login Required",
+    "loginToView": "Please login to view your projects."
+  },
+
+  "footer": {
+    "allRightsReserved": "All rights reserved"
   }
 }

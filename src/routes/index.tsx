@@ -7,6 +7,10 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import NotFound from "../pages/NotFound";
 import Profile from "../pages/Profile";
+import ProjectList from "../pages/ProjectList";
+import ProjectDetail from "../pages/ProjectDetail";
+import CreateProject from "../pages/CreateProject";
+import EditProject from "../pages/EditProject";
 
 import PrivateRoute from "../components/auth/PrivateRoute";
 
@@ -38,6 +42,28 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <Profile />
+          }
+        ]
+      },
+      {
+        path: "projects",
+        element: <PrivateRoute />,
+        children: [
+          {
+            index: true,
+            element: <ProjectList />
+          },
+          {
+            path: "create",
+            element: <CreateProject />
+          },
+          {
+            path: ":id",
+            element: <ProjectDetail />
+          },
+          {
+            path: ":id/edit",
+            element: <EditProject />
           }
         ]
       },

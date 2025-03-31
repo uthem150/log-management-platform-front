@@ -1,71 +1,111 @@
 // src/components/common/FormInput.tsx
-import { FieldError, UseFormRegisterReturn } from "react-hook-form";
+import React from "react";
 import styled from "@emotion/styled";
 import { colors } from "../../styles/theme";
+import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+const Container = styled.div`
+  margin-bottom: 1.5rem;
 `;
 
 const Label = styled.label`
+  display: block;
+  margin-bottom: 0.5rem;
   font-weight: 500;
   color: ${colors.text};
 `;
 
-const Input = styled.input<{ hasError?: boolean }>`
+const Input = styled.input`
+  width: 100%;
   padding: 0.75rem;
-  border: 1px solid ${props => (props.hasError ? colors.error : colors.gray)};
+  border: 1px solid ${colors.lightGray};
   border-radius: 4px;
   font-size: 1rem;
+  transition: border-color 0.2s;
 
   &:focus {
     outline: none;
-    border-color: ${props => (props.hasError ? colors.error : colors.primary)};
-    box-shadow: 0 0 0 1px ${props => (props.hasError ? colors.error : colors.primary)};
+    border-color: ${colors.primary};
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.15);
+  }
+
+  &::placeholder {
+    color: ${colors.gray};
   }
 `;
 
-const ErrorMessage = styled.p`
+const Textarea = styled.textarea`
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid ${colors.lightGray};
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  resize: vertical;
+  min-height: 100px;
+
+  &:focus {
+    outline: none;
+    border-color: ${colors.primary};
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.15);
+  }
+
+  &::placeholder {
+    color: ${colors.gray};
+  }
+`;
+
+const ErrorText = styled.div`
   color: ${colors.error};
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 `;
 
 interface FormInputProps {
   id: string;
   label: string;
+  type?: string;
   register: UseFormRegisterReturn;
   error?: FieldError;
-  type?: string;
   placeholder?: string;
   autoComplete?: string;
+  multiline?: boolean;
+  rows?: number;
+  disabled?: boolean;
 }
 
-const FormInput = ({
+const FormInput: React.FC<FormInputProps> = ({
   id,
   label,
+  type = "text",
   register,
   error,
-  type = "text",
   placeholder,
-  autoComplete
-}: FormInputProps) => {
+  autoComplete,
+  multiline = false,
+  rows = 3,
+  disabled = false
+}) => {
   return (
-    <FormGroup>
+    <Container>
       <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        type={type}
-        hasError={!!error}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
-        {...register}
-      />
-      {error && <ErrorMessage>{error.message}</ErrorMessage>}
-    </FormGroup>
+
+      {multiline ? (
+        <Textarea id={id} rows={rows} placeholder={placeholder} disabled={disabled} {...register} />
+      ) : (
+        <Input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          disabled={disabled}
+          {...register}
+        />
+      )}
+
+      {error && <ErrorText>{error.message}</ErrorText>}
+    </Container>
   );
 };
 

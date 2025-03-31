@@ -12,7 +12,10 @@ export const colors = {
   gray: "#6C757D",
   darkGray: "#343A40",
   white: "#FFFFFF",
-  black: "#000000"
+  black: "#000000",
+  danger: "#dc3545",
+  dangerDark: "#c82333",
+  red: "#FF0000"
 };
 
 export const fontSizes = {

@@ -1,8 +1,6 @@
 // src/components/layout/Layout.tsx
-
 // 라우팅을 위한 컴포넌트
-import { Outlet, Link, useNavigate } from "react-router-dom";
-
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 // Emotion styled-components로 스타일 정의
 import styled from "@emotion/styled";
 
@@ -42,15 +40,43 @@ const NavList = styled.ul`
   gap: 1.5rem;
 `;
 
-const NavItem = styled.li`
+const NavItem = styled.li<{ active?: boolean }>`
   a {
-    color: ${colors.text};
-    font-weight: 500;
+    color: ${props => (props.active ? colors.primary : colors.text)};
+    font-weight: ${props => (props.active ? 600 : 500)};
     text-decoration: none;
+    position: relative;
 
     &:hover {
       color: ${colors.primary};
     }
+
+    ${props =>
+      props.active &&
+      `
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: ${colors.primary};
+      }
+    `}
+  }
+`;
+
+const LogoutButton = styled.button`
+  background: none;
+  border: none;
+  color: ${colors.text};
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: ${colors.primary};
   }
 `;
 
@@ -60,6 +86,7 @@ const Main = styled.main`
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  background-color: ${colors.background};
 `;
 
 const Footer = styled.footer`
@@ -73,11 +100,23 @@ const Layout = () => {
   const { t } = useTranslation(); // i18n 다국어 텍스트 번역 함수
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, logout } = useAuthStore();
+
+  // 인증 상태 확인을 위한 콘솔 로그 추가
+  console.log("Auth State:", { isAuthenticated });
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+  };
+
+  // 현재 활성화된 경로 확인
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -87,39 +126,35 @@ const Layout = () => {
         <Nav>
           {/* 내비게이션 메뉴 리스트 */}
           <NavList>
-            <NavItem>
+            <NavItem active={isActive("/")}>
               <Link to="/">{t("common.home")}</Link>
             </NavItem>
-            <NavItem>
+
+            {isAuthenticated && (
+              <NavItem active={isActive("/projects")}>
+                <Link to="/projects">{t("common.projects")}</Link>
+              </NavItem>
+            )}
+
+            <NavItem active={isActive("/about")}>
               <Link to="/about">{t("common.about")}</Link>
             </NavItem>
 
             {isAuthenticated ? (
               <>
-                <NavItem>
-                  <Link to="/profile">Profile</Link>
+                <NavItem active={isActive("/profile")}>
+                  <Link to="/profile">{t("common.profile")}</Link>
                 </NavItem>
                 <NavItem>
-                  <button
-                    onClick={handleLogout}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: colors.text,
-                      fontWeight: 500,
-                      cursor: "pointer"
-                    }}
-                  >
-                    {t("common.logout")}
-                  </button>
+                  <LogoutButton onClick={handleLogout}>{t("common.logout")}</LogoutButton>
                 </NavItem>
               </>
             ) : (
               <>
-                <NavItem>
+                <NavItem active={isActive("/login")}>
                   <Link to="/login">{t("common.login")}</Link>
                 </NavItem>
-                <NavItem>
+                <NavItem active={isActive("/signup")}>
                   <Link to="/signup">{t("common.signup")}</Link>
                 </NavItem>
               </>

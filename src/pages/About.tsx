@@ -23,7 +23,8 @@ const About = () => {
     <Container>
       <Title>소개 페이지</Title>
       <Description>
-        이 앱에 대한 정보를 제공합니다. 여기에서는 앱의 목적, 사용법, 기능 등을 설명할 수 있습니다.
+        여러 클라우드 플랫폼의 로그를 한 곳에서 모니터링하고 분석하세요. Grafana 기반의 강력한
+        시각화와 직관적인 인터페이스로 로그 관리가 쉬워집니다.
       </Description>
     </Container>
   );
