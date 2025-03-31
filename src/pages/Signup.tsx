@@ -11,6 +11,8 @@ import FormInput from "../components/common/FormInput";
 import SubmitButton from "../components/common/SubmitButton";
 import useAuthStore from "../store/useAuthStore";
 import { authApi, SignupRequest } from "../api/auth";
+import GoogleLoginButton from "../components/auth/GoogleLoginButton";
+import GithubLoginButton from "../components/auth/GithubLoginButton";
 
 const Container = styled.div`
   max-width: 400px;
@@ -50,6 +52,25 @@ const SignupLink = styled.p`
   a {
     color: ${colors.primary};
     font-weight: 500;
+  }
+`;
+
+const OrDivider = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid ${colors.lightGray};
+  }
+
+  span {
+    margin: 0 10px;
+    color: ${colors.gray};
+    font-size: 0.875rem;
   }
 `;
 
@@ -115,6 +136,15 @@ const Signup = () => {
 
       {apiError && <ErrorMessage>{apiError}</ErrorMessage>}
 
+      {/* 소셜 로그인 버튼 */}
+      <GoogleLoginButton />
+      <GithubLoginButton />
+
+      <OrDivider>
+        <span>OR</span>
+      </OrDivider>
+
+      {/* 기존 폼 */}
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormInput
           id="name"
@@ -124,7 +154,6 @@ const Signup = () => {
           placeholder="John Doe"
           autoComplete="name"
         />
-
         <FormInput
           id="email"
           label={t("auth.email")}
@@ -134,7 +163,6 @@ const Signup = () => {
           placeholder="example@email.com"
           autoComplete="email"
         />
-
         <FormInput
           id="password"
           label={t("auth.password")}
@@ -143,7 +171,6 @@ const Signup = () => {
           error={errors.password}
           autoComplete="new-password"
         />
-
         <FormInput
           id="confirmPassword"
           label={t("auth.confirmPassword")}
@@ -152,7 +179,6 @@ const Signup = () => {
           error={errors.confirmPassword}
           autoComplete="new-password"
         />
-
         <SubmitButton text={t("common.signup")} loadingText="Signing up..." isLoading={isLoading} />
       </Form>
 

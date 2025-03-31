@@ -37,14 +37,14 @@ const useAuthStore = create<AuthState>()(
   persist(
     // 상태(set) 정의하는 함수
     set => ({
-      // user: null, // 초기 사용자 정보 없음
-      // token: null, // 초기 토큰 없음
-      // isAuthenticated: false, // 초기 로그인 상태: false
+      user: null, // 초기 사용자 정보 없음
+      token: null, // 초기 토큰 없음
+      isAuthenticated: false, // 초기 로그인 상태: false
 
       // 테스트 모드: 초기 상태에 더미 데이터 설정
-      user: testUser, // 테스트 사용자 정보
-      token: "test-token-123", // 테스트 토큰
-      isAuthenticated: true, // 로그인 상태 true로 설정
+      // user: testUser, // 테스트 사용자 정보
+      // token: "test-token-123", // 테스트 토큰
+      // isAuthenticated: true, // 로그인 상태 true로 설정
 
       // 로그인 함수
       login: (user, token) =>

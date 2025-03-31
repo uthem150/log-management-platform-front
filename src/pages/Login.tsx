@@ -11,6 +11,8 @@ import FormInput from "../components/common/FormInput";
 import SubmitButton from "../components/common/SubmitButton";
 import useAuthStore from "../store/useAuthStore";
 import { authApi, LoginRequest } from "../api/auth";
+import GoogleLoginButton from "../components/auth/GoogleLoginButton";
+import GithubLoginButton from "../components/auth/GithubLoginButton";
 
 const Container = styled.div`
   max-width: 400px;
@@ -69,6 +71,25 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+const OrDivider = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid ${colors.lightGray};
+  }
+
+  span {
+    margin: 0 10px;
+    color: ${colors.gray};
+    font-size: 0.875rem;
+  }
+`;
+
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -112,6 +133,14 @@ const Login = () => {
       <Title>{t("common.login")}</Title>
 
       {apiError && <ErrorMessage>{apiError}</ErrorMessage>}
+
+      {/* 소셜 로그인 버튼 */}
+      <GoogleLoginButton />
+      <GithubLoginButton />
+
+      <OrDivider>
+        <span>OR</span>
+      </OrDivider>
 
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormInput

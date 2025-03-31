@@ -21,6 +21,14 @@ export interface AuthResponse {
   token: string;
 }
 
+export interface GoogleLoginRequest {
+  token: string;
+}
+
+export interface GithubLoginRequest {
+  code: string;
+}
+
 export const authApi = {
   login: (data: LoginRequest) => api.post<AuthResponse>("/auth/login", data),
 
@@ -28,5 +36,9 @@ export const authApi = {
 
   logout: () => api.post("/auth/logout"),
 
-  getCurrentUser: () => api.get<AuthResponse>("/auth/me")
+  getCurrentUser: () => api.get<AuthResponse>("/auth/me"),
+
+  googleLogin: (data: GoogleLoginRequest) => api.post<AuthResponse>("/auth/google", data),
+
+  githubLogin: (data: GithubLoginRequest) => api.post<AuthResponse>("/auth/github", data)
 };

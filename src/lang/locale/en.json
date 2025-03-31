@@ -51,7 +51,6 @@
     "noProjects": "No Projects Found",
     "createFirstProject": "Create your first project!",
     "name": "Project Name",
-    "description": "Description",
     "namePlaceholder": "Enter project name",
     "descriptionPlaceholder": "Enter project description",
     "create": "Create Project",

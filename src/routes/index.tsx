@@ -13,6 +13,7 @@ import CreateProject from "../pages/CreateProject";
 import EditProject from "../pages/EditProject";
 
 import PrivateRoute from "../components/auth/PrivateRoute";
+import GithubCallback from "../pages/GithubCallback";
 
 const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
             element: <EditProject />
           }
         ]
+      },
+      {
+        path: "auth/github/callback",
+        element: <GithubCallback />
       },
       {
         path: "*",
