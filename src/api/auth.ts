@@ -38,7 +38,7 @@ export const authApi = {
 
   getCurrentUser: () => api.get<AuthResponse>("/auth/me"),
 
-  googleLogin: (data: GoogleLoginRequest) => api.post<AuthResponse>("/auth/google", data),
+  googleLogin: (data: GoogleLoginRequest) => api.post<AuthResponse>("/user/login/google", data),
 
-  githubLogin: (data: GithubLoginRequest) => api.post<AuthResponse>("/auth/github", data)
+  githubLogin: (data: GithubLoginRequest) => api.post<AuthResponse>("/user/login/github", data)
 };

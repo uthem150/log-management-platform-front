@@ -1,6 +1,5 @@
 // src/components/auth/GithubLoginButton.tsx
 import styled from "@emotion/styled";
-import { colors } from "../../styles/theme";
 import { useState } from "react";
 import { authApi } from "../../api/auth";
 import useAuthStore from "../../store/useAuthStore";
