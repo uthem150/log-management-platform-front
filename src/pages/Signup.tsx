@@ -138,13 +138,12 @@ const Signup = () => {
 
       {/* 소셜 로그인 버튼 */}
       <GoogleLoginButton />
-      <GithubLoginButton />
+      {/* <GithubLoginButton /> */}
 
-      <OrDivider>
+      {/* <OrDivider>
         <span>OR</span>
       </OrDivider>
 
-      {/* 기존 폼 */}
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormInput
           id="name"
@@ -180,7 +179,7 @@ const Signup = () => {
           autoComplete="new-password"
         />
         <SubmitButton text={t("common.signup")} loadingText="Signing up..." isLoading={isLoading} />
-      </Form>
+      </Form> */}
 
       <SignupLink>
         Already have an account? <Link to="/login">{t("common.login")}</Link>

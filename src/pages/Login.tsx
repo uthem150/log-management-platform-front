@@ -136,8 +136,8 @@ const Login = () => {
 
       {/* 소셜 로그인 버튼 */}
       <GoogleLoginButton />
-      <GithubLoginButton />
-
+      {/* <GithubLoginButton /> */}
+      {/* 
       <OrDivider>
         <span>OR</span>
       </OrDivider>
@@ -165,7 +165,7 @@ const Login = () => {
         <ForgotPassword to="/forgot-password">{t("auth.forgotPassword")}</ForgotPassword>
 
         <SubmitButton text={t("common.login")} loadingText="Logging in..." isLoading={isLoading} />
-      </Form>
+      </Form> */}
 
       <SignupLink>
         Don't have an account? <Link to="/signup">{t("common.signup")}</Link>
