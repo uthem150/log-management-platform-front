@@ -1,7 +1,8 @@
 // src/api/index.ts
 import axios from "axios";
 
-const API_BASE_URL = "https://api.example.com"; // 실제 API URL로 변경
+// 환경 변수에서 API_BASE_URL 가져오기
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
