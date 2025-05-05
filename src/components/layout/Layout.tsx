@@ -24,6 +24,9 @@ const Header = styled.header`
   background-color: ${colors.white};
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1rem 0;
+  width: 100%;
+  position: relative;
+  z-index: 10; // 다른 요소 위에 표시
 `;
 
 const Nav = styled.nav`
@@ -32,6 +35,7 @@ const Nav = styled.nav`
   padding: 0 1rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const NavList = styled.ul`
