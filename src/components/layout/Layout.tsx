@@ -48,6 +48,7 @@ const NavItem = styled.li<{ active?: boolean }>`
   a {
     color: ${props => (props.active ? colors.primary : colors.text)};
     font-weight: ${props => (props.active ? 600 : 500)};
+    font-size: 1.1rem;
     text-decoration: none;
     position: relative;
 
@@ -76,6 +77,7 @@ const LogoutButton = styled.button`
   border: none;
   color: ${colors.text};
   font-weight: 500;
+  font-size: 1.1rem; // NavItem과 일치시키기
   cursor: pointer;
   padding: 0;
 
