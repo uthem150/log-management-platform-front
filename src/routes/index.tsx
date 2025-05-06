@@ -6,7 +6,7 @@ import About from "../pages/About/About";
 import Login from "../pages/Login/Login";
 import Signup from "../pages/Signup";
 import NotFound from "../pages/NotFound/NotFound";
-import Profile from "../pages/Profile";
+import Profile from "../pages/Profile/Profile";
 import ProjectList from "../pages/ProjectList";
 import ProjectDetail from "../pages/ProjectDetail";
 import CreateProject from "../pages/CreateProject/CreateProject";

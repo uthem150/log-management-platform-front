@@ -1,4 +1,4 @@
-// src/pages/NotFound.tsx
+// src/pages/NotFound/NotFound.tsx
 
 import { useTranslation } from "react-i18next";
 import { BackLink, Container, Description, Title } from "./NotFound.style";
