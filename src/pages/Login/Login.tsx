@@ -1,4 +1,4 @@
-// src/pages/Login.tsx (React Hook Form 사용 버전)
+// src/pages/Login/Login.tsx (React Hook Form 사용 버전)
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,89 +6,21 @@ import { z } from "zod";
 import { useNavigate, Link } from "react-router-dom";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
-import { colors } from "../styles/theme";
-import FormInput from "../components/common/FormInput";
-import SubmitButton from "../components/common/SubmitButton";
-import useAuthStore from "../store/useAuthStore";
-import { authApi, LoginRequest } from "../api/auth";
-import GoogleLoginButton from "../components/auth/GoogleLoginButton";
-import GithubLoginButton from "../components/auth/GithubLoginButton";
-
-const Container = styled.div`
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background-color: white;
-`;
-
-const Title = styled.h1`
-  text-align: center;
-  margin-bottom: 2rem;
-  color: ${colors.primary};
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-const ErrorMessage = styled.p`
-  color: ${colors.error};
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: rgba(247, 37, 133, 0.1);
-  border-radius: 4px;
-  text-align: center;
-`;
-
-const ForgotPassword = styled(Link)`
-  font-size: 0.875rem;
-  color: ${colors.primary};
-  text-align: right;
-  margin-bottom: 1.5rem;
-  display: block;
-`;
-
-const SignupLink = styled.p`
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
-
-  a {
-    color: ${colors.primary};
-    font-weight: 500;
-  }
-`;
-
-// Zod 스키마 정의
-const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" })
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-
-const OrDivider = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 1.5rem 0;
-
-  &::before,
-  &::after {
-    content: "";
-    flex: 1;
-    border-bottom: 1px solid ${colors.lightGray};
-  }
-
-  span {
-    margin: 0 10px;
-    color: ${colors.gray};
-    font-size: 0.875rem;
-  }
-`;
+import { colors } from "../../styles/theme";
+import FormInput from "../../components/common/FormInput";
+import SubmitButton from "../../components/common/SubmitButton";
+import useAuthStore from "../../store/useAuthStore";
+import { authApi, LoginRequest } from "../../api/auth";
+import GoogleLoginButton from "../../components/auth/GoogleLoginButton";
+import GithubLoginButton from "../../components/auth/GithubLoginButton";
+import {
+  Container,
+  ErrorMessage,
+  LoginFormData,
+  loginSchema,
+  SignupLink,
+  Title
+} from "./Login.style";
 
 const Login = () => {
   const { t } = useTranslation();
