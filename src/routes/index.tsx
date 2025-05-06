@@ -2,7 +2,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import Home from "../pages/Home";
-import About from "../pages/About";
+import About from "../pages/About/About";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import NotFound from "../pages/NotFound";
@@ -21,7 +21,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        index: true,
+        index: true, // 기본 경로
         element: <Home />
       },
       {
@@ -41,7 +41,7 @@ const router = createBrowserRouter([
         element: <PrivateRoute />,
         children: [
           {
-            index: true,
+            index: true, // 기본 경로
             element: <Profile />
           }
         ]
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
         element: <PrivateRoute />,
         children: [
           {
-            index: true,
+            index: true, // 기본 경로
             element: <ProjectList />
           },
           {

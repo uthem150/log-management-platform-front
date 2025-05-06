@@ -1,22 +1,5 @@
 // src/pages/About.tsx
-import styled from "@emotion/styled";
-import { colors } from "../styles/theme";
-
-const Container = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-`;
-
-const Title = styled.h1`
-  color: ${colors.primary};
-  margin-bottom: 1.5rem;
-`;
-
-const Description = styled.p`
-  color: ${colors.text};
-  margin-bottom: 2rem;
-  line-height: 1.6;
-`;
+import { Container, Description, Title } from "./About.style";
 
 const About = () => {
   return (
