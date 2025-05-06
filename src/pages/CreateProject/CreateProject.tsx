@@ -10,6 +10,7 @@ import SubmitButton from "../../components/common/SubmitButton";
 import Button from "../../components/common/Button";
 import useProjectStore from "../../store/useProjectStore";
 import {
+  ActionButton,
   AddFieldButton,
   ButtonGroup,
   Card,
@@ -19,13 +20,15 @@ import {
   FieldInputContainer,
   FieldLabel,
   FieldRow,
+  FieldSelect,
   FilterCondition,
   FilterConditionsContainer,
   GptAssistButton,
-  InputGroup,
+  Input,
   LogSampleContainer,
   LogTypeButton,
   LogTypeSelector,
+  OperatorSelect,
   RemoveButton,
   SectionSubtitle,
   SectionTitle,
@@ -34,7 +37,8 @@ import {
   StepIndicator,
   StepNumber,
   TextArea,
-  Title
+  Title,
+  ValueInput
 } from "./CreateProject.style";
 
 // 로그 타입 정의
@@ -456,20 +460,22 @@ const CreateProject = () => {
 
               {filterConditions.map(condition => (
                 <FilterCondition key={condition.id}>
-                  <Select
-                    value={condition.field}
-                    onChange={e =>
-                      handleFilterConditionChange(condition.id, "field", e.target.value)
-                    }
-                  >
-                    {fields.map(field => (
-                      <option key={field.id} value={field.name}>
-                        {field.name}
-                      </option>
-                    ))}
-                  </Select>
+                  <FieldSelect>
+                    <Select
+                      value={condition.field}
+                      onChange={e =>
+                        handleFilterConditionChange(condition.id, "field", e.target.value)
+                      }
+                    >
+                      {fields.map(field => (
+                        <option key={field.id} value={field.name}>
+                          {field.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </FieldSelect>
 
-                  <InputGroup>
+                  <OperatorSelect>
                     <Select
                       value={condition.operator}
                       onChange={e =>
@@ -483,34 +489,29 @@ const CreateProject = () => {
                       <option value="equals">equals</option>
                       <option value="notEquals">not equals</option>
                     </Select>
-                  </InputGroup>
+                  </OperatorSelect>
 
-                  <InputGroup>
-                    <input
+                  <ValueInput>
+                    <Input
                       type="text"
                       value={condition.value}
                       onChange={e =>
                         handleFilterConditionChange(condition.id, "value", e.target.value)
                       }
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #e9ecef",
-                        borderRadius: "4px"
-                      }}
                       placeholder="필터 값"
                     />
-                  </InputGroup>
+                  </ValueInput>
 
-                  <RemoveButton
-                    type="button"
-                    onClick={() => handleRemoveFilterCondition(condition.id)}
-                  >
-                    삭제
-                  </RemoveButton>
+                  <ActionButton>
+                    <RemoveButton
+                      type="button"
+                      onClick={() => handleRemoveFilterCondition(condition.id)}
+                    >
+                      삭제
+                    </RemoveButton>
+                  </ActionButton>
                 </FilterCondition>
               ))}
-
               <AddFieldButton type="button" onClick={handleAddFilterCondition}>
                 + 필터 조건 추가
               </AddFieldButton>

@@ -177,10 +177,29 @@ export const FilterCondition = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
+  gap: 0.5rem;
 
   &:last-child {
     margin-bottom: 0;
   }
+`;
+
+export const FieldSelect = styled.div`
+  flex: 3; // 필드 선택 부분
+`;
+
+export const OperatorSelect = styled.div`
+  flex: 2; // 연산자 선택 부분
+`;
+
+export const ValueInput = styled.div`
+  flex: 2; // 값 입력 부분
+`;
+
+export const ActionButton = styled.div`
+  flex: 0.6; // 삭제 버튼 부분
+  display: flex;
+  justify-content: flex-end;
 `;
 
 export const Select = styled.select`
@@ -197,9 +216,18 @@ export const Select = styled.select`
   }
 `;
 
-export const InputGroup = styled.div`
-  flex: 1;
-  margin: 0 0.5rem;
+export const Input = styled.input`
+  padding: 0.75rem;
+  border: 1px solid ${colors.lightGray};
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: ${colors.primary};
+  }
 `;
 
 export const LogSampleContainer = styled.div`
