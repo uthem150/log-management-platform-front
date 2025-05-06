@@ -30,6 +30,14 @@ export const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-between;
   margin-top: 2rem;
+
+  gap: 0.5rem;
+  & > :nth-child(1) {
+    flex: 1;
+  }
+  & > :nth-child(2) {
+    flex: 3;
+  }
 `;
 
 export const ErrorMessage = styled.p`
