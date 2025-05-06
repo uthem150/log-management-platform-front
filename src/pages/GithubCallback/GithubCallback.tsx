@@ -1,28 +1,9 @@
-// src/pages/GithubCallback.tsx
+// src/pages/GithubCallback/GithubCallback.tsx
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { authApi } from "../api/auth";
-import useAuthStore from "../store/useAuthStore";
-import styled from "@emotion/styled";
-import { colors } from "../styles/theme";
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-`;
-
-const Title = styled.h1`
-  color: ${colors.primary};
-  margin-bottom: 1rem;
-`;
-
-const Message = styled.p`
-  color: ${colors.text};
-  margin-bottom: 2rem;
-`;
+import { authApi } from "../../api/auth";
+import useAuthStore from "../../store/useAuthStore";
+import { Container, Message, Title } from "./GithubCallback.style";
 
 const GithubCallback = () => {
   const location = useLocation(); // 현재 URL 정보를 가져와 GitHub에서 전달된 인증 코드를 추출

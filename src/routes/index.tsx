@@ -13,7 +13,7 @@ import CreateProject from "../pages/CreateProject/CreateProject";
 import EditProject from "../pages/EditProject/EditProject";
 
 import PrivateRoute from "../components/auth/PrivateRoute";
-import GithubCallback from "../pages/GithubCallback";
+import GithubCallback from "../pages/GithubCallback/GithubCallback";
 
 const router = createBrowserRouter([
   {
