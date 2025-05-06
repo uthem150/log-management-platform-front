@@ -7,7 +7,7 @@ import Login from "../pages/Login/Login";
 import Signup from "../pages/Signup";
 import NotFound from "../pages/NotFound/NotFound";
 import Profile from "../pages/Profile/Profile";
-import ProjectList from "../pages/ProjectList";
+import ProjectList from "../pages/ProjectList/ProjectList";
 import ProjectDetail from "../pages/ProjectDetail/ProjectDetail";
 import CreateProject from "../pages/CreateProject/CreateProject";
 import EditProject from "../pages/EditProject/EditProject";
