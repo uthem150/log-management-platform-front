@@ -1,5 +1,6 @@
-// src/pages/CreateProject/CreateProject.style.ts
+// src/pages/EditProject/EditProject.style.ts
 
+import { z } from "zod";
 import styled from "@emotion/styled";
 import { colors } from "../../styles/theme";
 
@@ -40,3 +41,17 @@ export const ErrorMessage = styled.p`
   background-color: rgba(247, 37, 133, 0.1);
   border-radius: 4px;
 `;
+
+export const LoadingState = styled.div`
+  text-align: center;
+  padding: 2rem;
+`;
+
+// Zod 스키마 정의
+export const projectSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Project name must be at least 2 characters")
+    .max(50, "Project name must be at most 50 characters"),
+  description: z.string().max(500, "Description must be at most 500 characters").optional()
+});

@@ -10,7 +10,7 @@ import Profile from "../pages/Profile";
 import ProjectList from "../pages/ProjectList";
 import ProjectDetail from "../pages/ProjectDetail";
 import CreateProject from "../pages/CreateProject/CreateProject";
-import EditProject from "../pages/EditProject";
+import EditProject from "../pages/EditProject/EditProject";
 
 import PrivateRoute from "../components/auth/PrivateRoute";
 import GithubCallback from "../pages/GithubCallback";

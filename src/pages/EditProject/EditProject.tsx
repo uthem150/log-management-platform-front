@@ -1,59 +1,22 @@
-// src/pages/EditProject.tsx
+// src/pages/EditProject/EditProject.tsx
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Form } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
-import { colors } from "../styles/theme";
-import FormInput from "../components/common/FormInput";
-import SubmitButton from "../components/common/SubmitButton";
-import Button from "../components/common/Button";
-import useProjectStore from "../store/useProjectStore";
-
-const Container = styled.div`
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-`;
-
-const Title = styled.h1`
-  color: ${colors.text};
-  margin-bottom: 1.5rem;
-`;
-
-const Card = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
-`;
-
-const ErrorMessage = styled.p`
-  color: ${colors.error};
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: rgba(247, 37, 133, 0.1);
-  border-radius: 4px;
-`;
-
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 2rem;
-`;
+import FormInput from "../../components/common/FormInput";
+import SubmitButton from "../../components/common/SubmitButton";
+import Button from "../../components/common/Button";
+import useProjectStore from "../../store/useProjectStore";
+import {
+  ButtonGroup,
+  Card,
+  Container,
+  ErrorMessage,
+  LoadingState,
+  Title
+} from "./EditProject.style";
 
 // Zod 스키마 정의
 const projectSchema = z.object({

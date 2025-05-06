@@ -1,4 +1,4 @@
-// src/pages/About.tsx
+// src/pages/About/About.tsx
 import { Container, Description, Title } from "./About.style";
 
 const About = () => {
