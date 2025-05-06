@@ -1,4 +1,4 @@
-// src/pages/About.tsx
+// src/pages/About/About.style.ts
 import styled from "@emotion/styled";
 import { colors } from "../../styles/theme";
 
