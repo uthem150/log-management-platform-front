@@ -1,125 +1,24 @@
-// src/pages/Home.tsx
+// src/pages/Home/Home.tsx
 import { useNavigate } from "react-router-dom";
-import styled from "@emotion/styled";
-import { colors } from "../styles/theme";
 import { useTranslation } from "react-i18next";
-import Button from "../components/common/Button";
-import useAuthStore from "../store/useAuthStore";
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 3rem 1rem;
-`;
-
-const HeroSection = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 4rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 2rem;
-  }
-`;
-
-const HeroContent = styled.div`
-  flex: 1;
-  padding-right: 2rem;
-
-  @media (max-width: 768px) {
-    padding-right: 0;
-  }
-`;
-
-const HeroImage = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-
-  img {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  color: ${colors.text};
-  margin-bottom: 1.5rem;
-  line-height: 1.2;
-
-  span {
-    color: ${colors.primary};
-  }
-
-  @media (max-width: 768px) {
-    font-size: 2.5rem;
-  }
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.2rem;
-  color: ${colors.gray};
-  margin-bottom: 2rem;
-  line-height: 1.6;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-`;
-
-const FeaturesSection = styled.div`
-  margin-bottom: 4rem;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 2rem;
-  color: ${colors.text};
-  margin-bottom: 2rem;
-  text-align: center;
-`;
-
-const FeatureGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-`;
-
-const FeatureCard = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  transition: transform 0.3s;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-`;
-
-const FeatureIcon = styled.div`
-  font-size: 2.5rem;
-  color: ${colors.primary};
-  margin-bottom: 1.5rem;
-`;
-
-const FeatureTitle = styled.h3`
-  font-size: 1.5rem;
-  color: ${colors.text};
-  margin-bottom: 1rem;
-`;
-
-const FeatureDescription = styled.p`
-  color: ${colors.gray};
-  line-height: 1.6;
-`;
+import Button from "../../components/common/Button";
+import useAuthStore from "../../store/useAuthStore";
+import {
+  ButtonGroup,
+  Container,
+  FeatureCard,
+  FeatureDescription,
+  FeatureGrid,
+  FeatureIcon,
+  FeaturesSection,
+  FeatureTitle,
+  HeroContent,
+  HeroImage,
+  HeroSection,
+  SectionTitle,
+  Subtitle,
+  Title
+} from "./Home.style";
 
 const Home = () => {
   const { t } = useTranslation();
