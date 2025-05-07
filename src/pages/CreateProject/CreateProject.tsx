@@ -26,6 +26,7 @@ import {
   FieldLabel,
   FieldRow,
   FieldSelect,
+  FieldSettingContainer,
   FilterCondition,
   FilterConditionsContainer,
   GptAssistButton,
@@ -34,6 +35,7 @@ import {
   LogSampleContainer,
   LogTypeButton,
   LogTypeSelector,
+  MultilineContainer,
   OperatorSelect,
   RadioInput,
   RadioOption,
@@ -419,10 +421,8 @@ const CreateProject = () => {
               </LogSampleContainer>
             )}
 
-            <div>
-              <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 500 }}>
-                필드 설정
-              </label>
+            <FieldSettingContainer>
+              <SectionTitle>필드 설정</SectionTitle>
 
               {fields.map(field => (
                 <FieldContainer key={field.id}>
@@ -473,88 +473,89 @@ const CreateProject = () => {
               <AddFieldButton type="button" onClick={handleAddField}>
                 + 필드 추가
               </AddFieldButton>
-            </div>
+            </FieldSettingContainer>
 
             {/* 멀티라인 처리 컴포넌트 */}
             {logType === "plainText" && (
-              <FieldContainer>
+              <MultilineContainer>
                 <SectionTitle>멀티라인 로그 처리</SectionTitle>
                 <SectionSubtitle>
                   여러 줄에 걸친 로그(에러 스택 트레이스 등)를 하나의 로그로 처리하기 위한
                   설정입니다.
                 </SectionSubtitle>
+                <FieldContainer>
+                  <FieldRow>
+                    <RadioOption>
+                      <RadioInput
+                        type="radio"
+                        name="multilineEnabled"
+                        value="enabled"
+                        checked={multilineEnabled}
+                        onChange={() => setMultilineEnabled(true)}
+                      />
+                      <span>멀티라인 처리 사용</span>
+                    </RadioOption>
 
-                <FieldRow>
-                  <RadioOption>
-                    <RadioInput
-                      type="radio"
-                      name="multilineEnabled"
-                      value="enabled"
-                      checked={multilineEnabled}
-                      onChange={() => setMultilineEnabled(true)}
-                    />
-                    <span>멀티라인 처리 사용</span>
-                  </RadioOption>
+                    <RadioOption>
+                      <RadioInput
+                        type="radio"
+                        name="multilineEnabled"
+                        value="disabled"
+                        checked={!multilineEnabled}
+                        onChange={() => setMultilineEnabled(false)}
+                      />
+                      <span>멀티라인 처리 안함</span>
+                    </RadioOption>
+                  </FieldRow>
 
-                  <RadioOption>
-                    <RadioInput
-                      type="radio"
-                      name="multilineEnabled"
-                      value="disabled"
-                      checked={!multilineEnabled}
-                      onChange={() => setMultilineEnabled(false)}
-                    />
-                    <span>멀티라인 처리 안함</span>
-                  </RadioOption>
-                </FieldRow>
+                  {multilineEnabled ? (
+                    <>
+                      <FieldRow>
+                        <FieldLabel>새 로그 시작 패턴</FieldLabel>
+                        <FieldInputContainer>
+                          <input
+                            type="text"
+                            value={multilinePattern}
+                            onChange={e => setMultilinePattern(e.target.value)}
+                            style={{
+                              width: "100%",
+                              padding: "0.75rem",
+                              border: "1px solid #e9ecef",
+                              borderRadius: "4px"
+                            }}
+                            placeholder="^[0-9]{4}-[0-9]{2}-[0-9]{2}"
+                          />
+                        </FieldInputContainer>
+                      </FieldRow>
 
-                {multilineEnabled ? (
-                  <>
-                    <FieldRow>
-                      <FieldLabel>새 로그 시작 패턴</FieldLabel>
-                      <FieldInputContainer>
-                        <input
-                          type="text"
-                          value={multilinePattern}
-                          onChange={e => setMultilinePattern(e.target.value)}
-                          style={{
-                            width: "100%",
-                            padding: "0.75rem",
-                            border: "1px solid #e9ecef",
-                            borderRadius: "4px"
-                          }}
-                          placeholder="^[0-9]{4}-[0-9]{2}-[0-9]{2}"
-                        />
-                      </FieldInputContainer>
-                    </FieldRow>
+                      <HelperText>
+                        이 정규식 패턴과 일치하는 줄이 나타나면 새로운 로그가 시작됩니다. <br />위
+                        예시는 '2023-01-01'과 같은 날짜로 시작하는 패턴입니다.
+                      </HelperText>
 
-                    <HelperText>
-                      이 정규식 패턴과 일치하는 줄이 나타나면 새로운 로그가 시작됩니다. <br />위
-                      예시는 '2023-01-01'과 같은 날짜로 시작하는 패턴입니다.
-                    </HelperText>
-
-                    <ExampleBlock>
-                      <ExampleTitle>예시 로그와 처리 방식:</ExampleTitle>
-                      <ExampleContent>
-                        <ExampleLine
-                          highlight
-                        >{`2025-04-18 12:13:05.000 ERROR [PaymentService]`}</ExampleLine>
-                        <ExampleLine indent>{`    at PaymentService.java:120`}</ExampleLine>
-                        <ExampleLine indent>{`    at TransactionHandler.java:55`}</ExampleLine>
-                        <ExampleLine
-                          highlight
-                        >{`2025-04-18 12:14:01.000 INFO [LoginService]`}</ExampleLine>
-                      </ExampleContent>
-                      <ExampleCaption>
-                        위와 같은 로그에서 강조된 줄에서 새 로그가 시작하고,
-                        <br /> 들여쓰기된 줄은 이전 로그의 일부로 처리됩니다.
-                      </ExampleCaption>
-                    </ExampleBlock>
-                  </>
-                ) : (
-                  <HelperText>한 줄 = 하나의 로그로 처리됩니다.</HelperText>
-                )}
-              </FieldContainer>
+                      <ExampleBlock>
+                        <ExampleTitle>예시 로그와 처리 방식:</ExampleTitle>
+                        <ExampleContent>
+                          <ExampleLine
+                            highlight
+                          >{`2025-04-18 12:13:05.000 ERROR [PaymentService]`}</ExampleLine>
+                          <ExampleLine indent>{`    at PaymentService.java:120`}</ExampleLine>
+                          <ExampleLine indent>{`    at TransactionHandler.java:55`}</ExampleLine>
+                          <ExampleLine
+                            highlight
+                          >{`2025-04-18 12:14:01.000 INFO [LoginService]`}</ExampleLine>
+                        </ExampleContent>
+                        <ExampleCaption>
+                          위와 같은 로그에서 강조된 줄에서 새 로그가 시작하고,
+                          <br /> 들여쓰기된 줄은 이전 로그의 일부로 처리됩니다.
+                        </ExampleCaption>
+                      </ExampleBlock>
+                    </>
+                  ) : (
+                    <HelperText>한 줄 = 하나의 로그로 처리됩니다.</HelperText>
+                  )}
+                </FieldContainer>
+              </MultilineContainer>
             )}
 
             <FilterConditionsContainer>
