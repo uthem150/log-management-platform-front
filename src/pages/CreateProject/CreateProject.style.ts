@@ -356,3 +356,15 @@ export const RadioInput = styled.input`
   margin: 0;
   cursor: pointer;
 `;
+
+export const DragHandle = styled.div`
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem;
+  color: ${colors.gray};
+  &:hover {
+    color: ${colors.text};
+  }
+`;

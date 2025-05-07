@@ -15,6 +15,7 @@ import {
   ButtonGroup,
   Card,
   Container,
+  DragHandle,
   ErrorMessage,
   ExampleBlock,
   ExampleCaption,
@@ -51,6 +52,16 @@ import {
   ValueInput
 } from "./CreateProject.style";
 
+// dnd-kit import
+import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 // 로그 타입 정의
 type LogType = "json" | "plainText" | "csv" | "xml";
 
@@ -81,8 +92,83 @@ interface FilterCondition {
   value: string;
 }
 
-// 컴포넌트 내 상태
-type MultilineType = "pattern" | "what" | "none";
+// SortableField 컴포넌트
+function SortableField({
+  field,
+  logType,
+  onFieldChange,
+  onRemoveField
+}: {
+  field: { id: string; name: string; path: string };
+  logType: "json" | "plainText" | "csv" | "xml";
+  onFieldChange: (id: string, key: "name" | "path", value: string) => void;
+  onRemoveField: (id: string) => void;
+}) {
+  // attributes: 키보드 접근성(aria-*) 속성 등, 필수 HTML 속성들.
+  // listeners: 마우스·터치 이벤트 핸들러들(onMouseDown, onTouchStart 등).
+  // setNodeRef: 아이템의 실제 DOM 노드에 ref를 연결해, dnd‑kit이 위치를 추적할 수 있도록 함.
+  // transform, transition: 드래그 중 계산된 이동 좌표와 애니메이션 타이밍.
+  // isDragging: 현재 이 아이템이 드래그 중인지 여부(Boolean).
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    boxShadow: isDragging ? "0 2px 8px rgba(0,0,0,0.2)" : undefined,
+    backgroundColor: isDragging ? "rgba(67,97,238,0.05)" : undefined
+  };
+
+  return (
+    // setNodeRef로 이 컨테이너를 dnd‑kit이 제어하는 노드로 등록
+    <FieldContainer ref={setNodeRef} style={style}>
+      {/* 이 요소만 잡고 드래그할 수 있게 함 */}
+      <DragHandle {...attributes} {...listeners}>
+        ☰
+      </DragHandle>
+
+      <FieldRow>
+        <FieldLabel>필드 이름</FieldLabel>
+        <FieldInputContainer>
+          <input
+            type="text"
+            value={field.name}
+            onChange={e => onFieldChange(field.id, "name", e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.75rem",
+              border: "1px solid #e9ecef",
+              borderRadius: "4px"
+            }}
+            placeholder="timestamp, logLevel, message 등"
+          />
+        </FieldInputContainer>
+        <RemoveButton type="button" onClick={() => onRemoveField(field.id)}>
+          삭제
+        </RemoveButton>
+      </FieldRow>
+
+      <FieldRow>
+        <FieldLabel>{logType === "json" ? "JSON 경로" : "정규식 패턴"}</FieldLabel>
+        <FieldInputContainer>
+          <input
+            type="text"
+            value={field.path}
+            onChange={e => onFieldChange(field.id, "path", e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.75rem",
+              border: "1px solid #e9ecef",
+              borderRadius: "4px"
+            }}
+            placeholder={logType === "json" ? "data.timestamp" : "^\\d{4}-\\d{2}-\\d{2}"}
+          />
+        </FieldInputContainer>
+      </FieldRow>
+    </FieldContainer>
+  );
+}
 
 const CreateProject = () => {
   const { t } = useTranslation();
@@ -226,6 +312,26 @@ const CreateProject = () => {
     alert(
       "이 기능은 아직 구현되지 않았습니다. 실제 서비스에서는 GPT API를 통해 로그 샘플을 분석하여 정규식을 자동 생성합니다."
     );
+  };
+
+  // 드래그 종료 후 호출
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    // active.id: 드래그 시작한 아이템의 ID
+    // over.id: 드롭 지점(마우스를 떼는 순간) 위에 있는 아이템의 ID
+
+    if (!over || active.id === over.id) return;
+
+    // 1) 움직인 아이템의 이전 인덱스
+    const oldIndex = fields.findIndex(f => f.id === active.id);
+    // 2) 놓인 위치의 인덱스
+    const newIndex = fields.findIndex(f => f.id === over.id);
+
+    // 3) arrayMove를 통해 순서 교체
+    // oldIndex 위치의 요소를 꺼내고
+    // newIndex 위치에 삽입한다.
+    setFields(arrayMove(fields, oldIndex, newIndex));
   };
 
   const onSubmit = async (data: ProjectFormData) => {
@@ -424,51 +530,26 @@ const CreateProject = () => {
             <FieldSettingContainer>
               <SectionTitle>필드 설정</SectionTitle>
 
-              {fields.map(field => (
-                <FieldContainer key={field.id}>
-                  <FieldRow>
-                    <FieldLabel>필드 이름</FieldLabel>
-                    <FieldInputContainer>
-                      <input
-                        type="text"
-                        value={field.name}
-                        onChange={e => handleFieldChange(field.id, "name", e.target.value)}
-                        style={{
-                          width: "100%",
-                          padding: "0.75rem",
-                          border: "1px solid #e9ecef",
-                          borderRadius: "4px"
-                        }}
-                        placeholder="timestamp, logLevel, message 등"
-                      />
-                    </FieldInputContainer>
-
-                    <RemoveButton type="button" onClick={() => handleRemoveField(field.id)}>
-                      삭제
-                    </RemoveButton>
-                  </FieldRow>
-
-                  <FieldRow>
-                    <FieldLabel>{logType === "json" ? "JSON 경로" : "정규식 패턴"}</FieldLabel>
-                    <FieldInputContainer>
-                      <input
-                        type="text"
-                        value={field.path}
-                        onChange={e => handleFieldChange(field.id, "path", e.target.value)}
-                        style={{
-                          width: "100%",
-                          padding: "0.75rem",
-                          border: "1px solid #e9ecef",
-                          borderRadius: "4px"
-                        }}
-                        placeholder={
-                          logType === "json" ? "data.timestamp" : "^\\d{4}-\\d{2}-\\d{2}"
-                        }
-                      />
-                    </FieldInputContainer>
-                  </FieldRow>
-                </FieldContainer>
-              ))}
+              {/* DndContext : 드래그·드롭 기능의 최상위 컨텍스트. */}
+              {/* collisionDetection={closestCenter}: 드래그 중인 아이템과 다른 아이템 간 충돌 판정을, 리스트 아이템의 중앙을 기준으로 계산하도록 설정. */}
+              {/* onDragEnd={handleDragEnd}: 드래그가 끝나고 손을 뗄 때 호출되는 콜백. */}
+              <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                {/* SortableContext : DndContext 내부에서 “이 배열(items) 안의 요소들이 정렬 가능한 리스트”라고 알려주는 래퍼 */}
+                <SortableContext
+                  items={fields.map(f => f.id)} // 드래그 가능한 각 아이템을 고유 ID 리스트로 전달
+                  strategy={verticalListSortingStrategy} // 수직 리스트에 특화된 충돌 처리·애니메이션
+                >
+                  {fields.map(field => (
+                    <SortableField
+                      key={field.id}
+                      field={field}
+                      logType={logType}
+                      onFieldChange={handleFieldChange}
+                      onRemoveField={handleRemoveField}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
 
               <AddFieldButton type="button" onClick={handleAddField}>
                 + 필드 추가
