@@ -32,10 +32,10 @@ export const ButtonGroup = styled.div`
   margin-top: 2rem;
 
   gap: 0.5rem;
-  & > :nth-child(1) {
+  & > :nth-of-type(1) {
     flex: 1;
   }
-  & > :nth-child(2) {
+  & > :nth-of-type(2) {
     flex: 3;
   }
 `;
