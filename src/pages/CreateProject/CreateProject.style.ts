@@ -125,6 +125,7 @@ export const SectionSubtitle = styled.p`
 
 export const FieldContainer = styled.div`
   margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
   padding: 1rem;
   border: 1px solid ${colors.lightGray};
   border-radius: 4px;
@@ -273,4 +274,78 @@ export const GptAssistButton = styled.button`
   &:hover {
     background-color: #3ba3d0;
   }
+`;
+
+// 멀티라인 관련 스타일 컴포넌트
+
+export const ExampleBlock = styled.div`
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid ${colors.primary};
+`;
+
+export const ExampleTitle = styled.div`
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: ${colors.text};
+`;
+
+export const ExampleContent = styled.div`
+  font-family: monospace;
+  font-size: 0.85rem;
+  background-color: #2d2d2d;
+  color: #f8f8f2;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+`;
+
+export const ExampleLine = styled.div<{ highlight?: boolean; indent?: boolean }>`
+  padding: 0.15rem 0;
+  ${props =>
+    props.highlight &&
+    `
+    color: #72b01d;
+    font-weight: bold;
+  `}
+  ${props =>
+    props.indent &&
+    `
+    padding-left: 1.5rem;
+    color: #cccccc;
+  `}
+`;
+
+export const ExampleCaption = styled.div`
+  font-size: 0.85rem;
+  color: ${colors.gray};
+  line-height: 1.4;
+  margin-top: 0.5rem;
+`;
+
+export const HelperText = styled.div`
+  font-size: 0.85rem;
+  color: ${colors.gray};
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+`;
+
+export const RadioOption = styled.label`
+  display: flex;
+  align-items: center;
+  margin-right: 2rem;
+  cursor: pointer;
+
+  span {
+    margin-left: 0.5rem;
+  }
+`;
+
+export const RadioInput = styled.input`
+  margin: 0;
+  cursor: pointer;
 `;
