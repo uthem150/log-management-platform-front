@@ -124,8 +124,8 @@ export const SectionSubtitle = styled.p`
 `;
 
 export const FieldContainer = styled.div`
-  margin-bottom: 1.5rem;
-  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
   padding: 1rem;
   border: 1px solid ${colors.lightGray};
   border-radius: 4px;
