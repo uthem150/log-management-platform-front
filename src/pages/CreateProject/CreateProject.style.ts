@@ -122,9 +122,6 @@ export const SectionSubtitle = styled.p`
   color: ${colors.gray};
   font-size: 0.9rem;
 `;
-export const FieldSettingContainer = styled.div`
-  margin-top: 1.5rem;
-`;
 
 export const FieldContainer = styled.div`
   margin-bottom: 1.5rem;
@@ -179,10 +176,6 @@ export const AddFieldButton = styled.button`
   &:hover {
     background-color: rgba(67, 97, 238, 0.05);
   }
-`;
-
-export const FilterConditionsContainer = styled.div`
-  margin-top: 1.5rem;
 `;
 
 export const FilterCondition = styled.div`
@@ -280,10 +273,6 @@ export const GptAssistButton = styled.button`
 `;
 
 // 멀티라인 관련 스타일 컴포넌트
-
-export const MultilineContainer = styled.div`
-  margin-top: 2.5rem;
-`;
 
 export const ExampleBlock = styled.div`
   margin-top: 1rem;

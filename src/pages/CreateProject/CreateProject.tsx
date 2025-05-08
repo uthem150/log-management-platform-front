@@ -27,16 +27,13 @@ import {
   FieldLabel,
   FieldRow,
   FieldSelect,
-  FieldSettingContainer,
   FilterCondition,
-  FilterConditionsContainer,
   GptAssistButton,
   HelperText,
   Input,
   LogSampleContainer,
   LogTypeButton,
   LogTypeSelector,
-  MultilineContainer,
   OperatorSelect,
   RadioInput,
   RadioOption,
@@ -69,6 +66,7 @@ import {
   verticalListSortingStrategy
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import Accordion from "../../components/common/Accordion/Accordion";
 
 // 로그 타입 정의
 type LogType = "json" | "plainText" | "csv" | "xml";
@@ -546,9 +544,7 @@ const CreateProject = () => {
               </LogSampleContainer>
             )}
 
-            <FieldSettingContainer>
-              <SectionTitle>필드 설정</SectionTitle>
-
+            <Accordion title="필드 설정" defaultOpen={true}>
               {/* DndContext : 드래그·드롭 기능의 최상위 컨텍스트. */}
               {/* collisionDetection={closestCenter}: 드래그 중인 아이템과 다른 아이템 간 충돌 판정을, 리스트 아이템의 중앙을 기준으로 계산하도록 설정. */}
               {/* onDragEnd={handleDragEnd}: 드래그가 끝나고 손을 뗄 때 호출되는 콜백. */}
@@ -577,12 +573,11 @@ const CreateProject = () => {
               <AddFieldButton type="button" onClick={handleAddField}>
                 + 필드 추가
               </AddFieldButton>
-            </FieldSettingContainer>
+            </Accordion>
 
             {/* 멀티라인 처리 컴포넌트 */}
             {logType === "plainText" && (
-              <MultilineContainer>
-                <SectionTitle>멀티라인 로그 처리</SectionTitle>
+              <Accordion title="멀티라인 로그 처리" defaultOpen={true}>
                 <SectionSubtitle>
                   여러 줄에 걸친 로그(에러 스택 트레이스 등)를 하나의 로그로 처리하기 위한
                   설정입니다.
@@ -659,11 +654,10 @@ const CreateProject = () => {
                     <HelperText>한 줄 = 하나의 로그로 처리됩니다.</HelperText>
                   )}
                 </FieldContainer>
-              </MultilineContainer>
+              </Accordion>
             )}
 
-            <FilterConditionsContainer>
-              <SectionTitle>필터링 조건 (선택)</SectionTitle>
+            <Accordion title="필터링 조건 (선택)" defaultOpen={true}>
               <SectionSubtitle>
                 특정 조건에 맞는 로그만 수집하도록 필터를 설정할 수 있습니다.
               </SectionSubtitle>
@@ -725,7 +719,7 @@ const CreateProject = () => {
               <AddFieldButton type="button" onClick={handleAddFilterCondition}>
                 + 필터 조건 추가
               </AddFieldButton>
-            </FilterConditionsContainer>
+            </Accordion>
 
             <ButtonGroup>
               <Button variant="secondary" onClick={handlePrevStep}>
