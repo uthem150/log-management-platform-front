@@ -53,7 +53,15 @@ import {
 } from "./CreateProject.style";
 
 // dnd-kit import
-import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  MouseSensor,
+  TouchSensor,
+  DragEndEvent
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
@@ -284,7 +292,7 @@ const CreateProject = () => {
   // 필터 조건 추가
   const handleAddFilterCondition = () => {
     const newCondition: FilterCondition = {
-      id: Date.now().toString(),
+      id: Date.now().toString(), // 임의 id 지정
       field: fields[0]?.name || "",
       operator: "equals",
       value: ""
@@ -333,6 +341,17 @@ const CreateProject = () => {
     // newIndex 위치에 삽입한다.
     setFields(arrayMove(fields, oldIndex, newIndex));
   };
+
+  // 커스텀 센서 등록
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 100, // 100ms 터치 홀드 후 활성화
+        tolerance: 5 // 5px 이내 움직임 허용
+      }
+    })
+  );
 
   const onSubmit = async (data: ProjectFormData) => {
     setApiError(null);
@@ -533,7 +552,11 @@ const CreateProject = () => {
               {/* DndContext : 드래그·드롭 기능의 최상위 컨텍스트. */}
               {/* collisionDetection={closestCenter}: 드래그 중인 아이템과 다른 아이템 간 충돌 판정을, 리스트 아이템의 중앙을 기준으로 계산하도록 설정. */}
               {/* onDragEnd={handleDragEnd}: 드래그가 끝나고 손을 뗄 때 호출되는 콜백. */}
-              <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
                 {/* SortableContext : DndContext 내부에서 “이 배열(items) 안의 요소들이 정렬 가능한 리스트”라고 알려주는 래퍼 */}
                 <SortableContext
                   items={fields.map(f => f.id)} // 드래그 가능한 각 아이템을 고유 ID 리스트로 전달
