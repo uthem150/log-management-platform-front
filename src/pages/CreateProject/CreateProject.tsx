@@ -101,6 +101,9 @@ interface FilterCondition {
   value: string;
 }
 
+// 기본 필드 상수 정의
+const DEFAULT_FIELDS = ["timestamp", "logLevel", "message"];
+
 // SortableField 컴포넌트
 function SortableField({
   field,
@@ -129,6 +132,9 @@ function SortableField({
     backgroundColor: isDragging ? "rgba(67,97,238,0.05)" : undefined
   };
 
+  // 기본 필드인지 체크
+  const isDefaultField = DEFAULT_FIELDS.includes(field.name);
+
   return (
     // setNodeRef로 이 컨테이너를 dnd‑kit이 제어하는 노드로 등록
     <FieldContainer ref={setNodeRef} style={style}>
@@ -151,11 +157,21 @@ function SortableField({
               borderRadius: "4px"
             }}
             placeholder="timestamp, logLevel, message 등"
+            // 기본 필드인 경우 수정 불가
+            disabled={isDefaultField}
           />
         </FieldInputContainer>
-        <RemoveButton type="button" onClick={() => onRemoveField(field.id)}>
-          삭제
-        </RemoveButton>
+
+        {/* 기본 필드가 아닌 경우에만 삭제 버튼 표시 */}
+        {!isDefaultField ? (
+          <RemoveButton type="button" onClick={() => onRemoveField(field.id)}>
+            삭제
+          </RemoveButton>
+        ) : (
+          <div style={{ width: "70px", textAlign: "center" }}>
+            <span style={{ fontSize: "0.8rem", color: "#888" }}>기본 필드</span>
+          </div>
+        )}
       </FieldRow>
 
       {/* JSON 타입일 때만 경로 입력 필드 표시 */}
@@ -267,7 +283,18 @@ const CreateProject = () => {
 
   // 필드 제거
   const handleRemoveField = (id: string) => {
+    // 삭제하려는 필드 찾기
+    const fieldToRemove = fields.find(field => field.id === id);
+
+    // 기본 필드인 경우 삭제 방지
+    if (fieldToRemove && DEFAULT_FIELDS.includes(fieldToRemove.name)) {
+      alert(`${fieldToRemove.name}은(는) 기본 필드이므로 삭제할 수 없습니다.`);
+      return;
+    }
+
+    // 기본 필드가 아닌 경우 삭제 진행
     setFields(fields.filter(field => field.id !== id));
+
     // 관련 필터 조건도 제거
     setFilterConditions(
       filterConditions.filter(
@@ -278,6 +305,16 @@ const CreateProject = () => {
 
   // 필드 업데이트
   const handleFieldChange = (id: string, key: keyof Field, value: string) => {
+    // 필드 이름 변경 시 기본 필드와 중복 체크
+    if (key === "name" && DEFAULT_FIELDS.includes(value)) {
+      // 이미 존재하는 기본 필드 이름인지 확인
+      const isDuplicate = fields.some(field => field.name === value && field.id !== id);
+      if (isDuplicate) {
+        alert(`${value}은(는) 기본 필드이므로 중복해서 사용할 수 없습니다.`);
+        return;
+      }
+    }
+
     setFields(fields.map(field => (field.id === id ? { ...field, [key]: value } : field)));
 
     // 필드 이름이 변경된 경우 필터 조건도 업데이트
@@ -570,8 +607,7 @@ const CreateProject = () => {
               </InfoTitle>
               <InfoText>
                 필드는 설정한 순서대로 로그 데이터에 적용됩니다. 드래그 앤 드롭으로 필드 순서를
-                변경할 수 있습니다. 일반적으로 timestamp, logLevel, message 순으로 설정하는 것이
-                권장됩니다.
+                변경할 수 있습니다.
               </InfoText>
             </InfoBox>
 

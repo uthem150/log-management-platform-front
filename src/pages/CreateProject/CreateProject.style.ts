@@ -380,7 +380,7 @@ export const InfoTitle = styled.div`
 
 export const InfoText = styled.p`
   color: ${colors.gray};
-  font-size: 0.9rem;
+  font-size: 0.83rem;
   line-height: 1.5;
   margin: 0;
 `;
