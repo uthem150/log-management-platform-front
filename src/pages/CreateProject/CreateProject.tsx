@@ -30,6 +30,9 @@ import {
   FilterCondition,
   GptAssistButton,
   HelperText,
+  InfoBox,
+  InfoText,
+  InfoTitle,
   Input,
   LogSampleContainer,
   LogTypeButton,
@@ -527,6 +530,31 @@ const CreateProject = () => {
               로그에서 추출할 필드를 설정해주세요.{" "}
               {logType === "plainText" && "Plain Text의 경우 정규식을 사용해 필드를 추출합니다."}
             </SectionSubtitle>
+            <InfoBox>
+              <InfoTitle>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <circle cx="12" cy="16" r="1" fill="currentColor" />
+                </svg>
+                필드 순서 안내
+              </InfoTitle>
+              <InfoText>
+                필드는 설정한 순서대로 로그 데이터에 적용됩니다. 드래그 앤 드롭으로 필드 순서를
+                변경할 수 있습니다. 일반적으로 timestamp, logLevel, message 순으로 설정하는 것이
+                권장됩니다.
+              </InfoText>
+            </InfoBox>
 
             {logType === "plainText" && (
               <LogSampleContainer>

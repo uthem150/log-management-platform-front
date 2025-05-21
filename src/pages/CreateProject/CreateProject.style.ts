@@ -357,3 +357,30 @@ export const DragHandle = styled.div`
     color: ${colors.text};
   }
 `;
+
+export const InfoBox = styled.div`
+  background-color: rgba(67, 97, 238, 0.05);
+  border-left: 3px solid ${colors.primary};
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+`;
+
+export const InfoTitle = styled.div`
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+
+  svg {
+    margin-right: 0.5rem;
+    color: ${colors.primary};
+  }
+`;
+
+export const InfoText = styled.p`
+  color: ${colors.gray};
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+`;
