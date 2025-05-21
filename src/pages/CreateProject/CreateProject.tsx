@@ -102,7 +102,6 @@ interface FilterCondition {
 }
 
 // SortableField 컴포넌트
-// SortableField 컴포넌트 업데이트
 function SortableField({
   field,
   logType,
@@ -218,7 +217,7 @@ const CreateProject = () => {
 
   // 다음 단계로 이동
   const handleNextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -424,9 +423,13 @@ const CreateProject = () => {
           <StepNumber>2</StepNumber>
           수집 경로 설정
         </Step>
-        <Step active={currentStep === 3} completed={false}>
+        <Step active={currentStep === 3} completed={currentStep > 3}>
           <StepNumber>3</StepNumber>
           파싱 설정
+        </Step>
+        <Step active={currentStep === 4} completed={currentStep > 4}>
+          <StepNumber>4</StepNumber>
+          확인
         </Step>
       </StepIndicator>
 
@@ -763,6 +766,103 @@ const CreateProject = () => {
               <AddFieldButton type="button" onClick={handleAddFilterCondition}>
                 + 필터 조건 추가
               </AddFieldButton>
+            </Accordion>
+
+            <ButtonGroup>
+              <Button variant="secondary" onClick={handlePrevStep}>
+                이전
+              </Button>
+              <Button
+                onClick={handleNextStep}
+                disabled={!watch("collectionPath") || !!errors.collectionPath}
+              >
+                다음
+              </Button>
+            </ButtonGroup>
+          </Card>
+        )}
+
+        {/* 4단계: 확인 */}
+        {currentStep === 4 && (
+          <Card>
+            <SectionTitle>설정 확인</SectionTitle>
+            <SectionSubtitle>입력하신 정보를 확인하고 프로젝트를 생성합니다.</SectionSubtitle>
+
+            <Accordion title="기본 정보" defaultOpen={true} icon="info">
+              <FieldContainer>
+                <FieldRow>
+                  <FieldLabel>프로젝트 이름</FieldLabel>
+                  <div>{getValues("name")}</div>
+                </FieldRow>
+                {getValues("description") && (
+                  <FieldRow>
+                    <FieldLabel>설명</FieldLabel>
+                    <div style={{ whiteSpace: "pre-wrap" }}>{getValues("description")}</div>
+                  </FieldRow>
+                )}
+              </FieldContainer>
+            </Accordion>
+
+            <Accordion title="수집 설정" defaultOpen={true} icon="settings">
+              <FieldContainer>
+                <FieldRow>
+                  <FieldLabel>수집 경로</FieldLabel>
+                  <div>{getValues("collectionPath")}</div>
+                </FieldRow>
+                <FieldRow>
+                  <FieldLabel>로그 형식</FieldLabel>
+                  <div>
+                    {logType === "json" && "JSON"}
+                    {logType === "plainText" && "Plain Text"}
+                    {logType === "csv" && "CSV"}
+                    {logType === "xml" && "XML"}
+                  </div>
+                </FieldRow>
+              </FieldContainer>
+            </Accordion>
+
+            <Accordion title="파싱 설정" defaultOpen={true} icon="fields">
+              <FieldContainer>
+                <SectionSubtitle>설정된 필드</SectionSubtitle>
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    style={{
+                      padding: "0.5rem 0",
+                      borderBottom: index < fields.length - 1 ? "1px dashed #eee" : "none"
+                    }}
+                  >
+                    {index + 1}. {field.name}
+                    {logType === "json" && field.path && ` (${field.path})`}
+                  </div>
+                ))}
+              </FieldContainer>
+
+              {logType === "plainText" && multilineEnabled && (
+                <>
+                  <SectionSubtitle style={{ marginTop: "1rem" }}>멀티라인 설정</SectionSubtitle>
+                  <FieldContainer>
+                    <div>멀티라인 처리 사용</div>
+                    <div style={{ marginTop: "0.5rem" }}>
+                      <strong>새 로그 시작 패턴:</strong> {multilinePattern}
+                    </div>
+                  </FieldContainer>
+                </>
+              )}
+
+              {filterConditions.length > 0 && (
+                <>
+                  <SectionSubtitle style={{ marginTop: "1rem" }}>필터링 조건</SectionSubtitle>
+                  <FieldContainer>
+                    {filterConditions.map((condition, index) => (
+                      <div key={condition.id} style={{ marginBottom: "0.5rem" }}>
+                        {index + 1}. {condition.field}{" "}
+                        {condition.operator === "equals" ? "=" : "!="} {condition.value}
+                      </div>
+                    ))}
+                  </FieldContainer>
+                </>
+              )}
             </Accordion>
 
             <ButtonGroup>
