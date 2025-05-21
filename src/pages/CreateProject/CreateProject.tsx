@@ -102,6 +102,7 @@ interface FilterCondition {
 }
 
 // SortableField 컴포넌트
+// SortableField 컴포넌트 업데이트
 function SortableField({
   field,
   logType,
@@ -158,23 +159,26 @@ function SortableField({
         </RemoveButton>
       </FieldRow>
 
-      <FieldRow>
-        <FieldLabel>{logType === "json" ? "JSON 경로" : "정규식 패턴"}</FieldLabel>
-        <FieldInputContainer>
-          <input
-            type="text"
-            value={field.path}
-            onChange={e => onFieldChange(field.id, "path", e.target.value)}
-            style={{
-              width: "100%",
-              padding: "0.75rem",
-              border: "1px solid #e9ecef",
-              borderRadius: "4px"
-            }}
-            placeholder={logType === "json" ? "data.timestamp" : "^\\d{4}-\\d{2}-\\d{2}"}
-          />
-        </FieldInputContainer>
-      </FieldRow>
+      {/* JSON 타입일 때만 경로 입력 필드 표시 */}
+      {logType === "json" && (
+        <FieldRow>
+          <FieldLabel>JSON 경로</FieldLabel>
+          <FieldInputContainer>
+            <input
+              type="text"
+              value={field.path}
+              onChange={e => onFieldChange(field.id, "path", e.target.value)}
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                border: "1px solid #e9ecef",
+                borderRadius: "4px"
+              }}
+              placeholder="data.timestamp"
+            />
+          </FieldInputContainer>
+        </FieldRow>
+      )}
     </FieldContainer>
   );
 }
@@ -358,6 +362,18 @@ const CreateProject = () => {
     setApiError(null);
 
     try {
+      // 필드 데이터 준비
+      const processedFields = fields
+        .filter(field => field.name) // 이름이 있는 필드만 포함
+        .map(field => {
+          // Plain Text일 경우 path 속성 제외
+          if (logType === "plainText") {
+            return { name: field.name };
+          }
+          // 다른 포맷일 경우 name과 path 모두 포함
+          return { name: field.name, path: field.path };
+        });
+
       // 프로젝트 데이터 구성
       const projectData = {
         name: data.name,
@@ -365,7 +381,7 @@ const CreateProject = () => {
         logConfig: {
           logType,
           collectionPath: data.collectionPath,
-          fields: fields.filter(field => field.name && field.path),
+          fields: processedFields,
           filterConditions: filterConditions.filter(condition => condition.value),
           // 멀티라인 설정
           multiline:
