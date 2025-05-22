@@ -44,5 +44,24 @@ export const projectApi = {
 
   // 파일 다운로드 상태 확인
   checkDownloadStatus: (projectId: string) =>
-    api.get<{ downloaded: boolean; timestamp?: string }>(`/projects/${projectId}/download-status`)
+    api.get<{ downloaded: boolean; timestamp?: string }>(`/projects/${projectId}/download-status`),
+
+  // 대시보드 생성 상태 확인 (polling용)
+  checkDashboardCreationStatus: () =>
+    api.get<{
+      inProgress: boolean;
+      projectsInProgress: Array<{
+        projectId: string;
+        projectName: string;
+        status: "creating" | "completed" | "failed";
+      }>;
+    }>("/projects/dashboard-status"),
+
+  // 특정 프로젝트의 대시보드 생성 상태 확인
+  checkProjectDashboardStatus: (projectId: string) =>
+    api.get<{
+      status: "creating" | "completed" | "failed";
+      dashboardUrl?: string;
+      error?: string;
+    }>(`/projects/${projectId}/dashboard-status`)
 };

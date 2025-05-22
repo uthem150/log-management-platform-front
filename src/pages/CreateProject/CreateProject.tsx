@@ -495,7 +495,7 @@ const CreateProject = () => {
 
   // 프로젝트 목록으로 이동 핸들러
   const handleGoToProjects = () => {
-    navigate("/projects");
+    navigate("/projects?dashboardCreating=true");
   };
 
   return (
