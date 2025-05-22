@@ -25,9 +25,16 @@ const ToastContainer = styled.div<{ visible: boolean }>`
   bottom: 30px;
   right: 30px;
   background: white;
+
+  /* 외곽 그라데이션 + 내부 흰색 배경을 두 개의 background로 겹침 */
+  background-image:
+    linear-gradient(white, white), linear-gradient(90deg, ${colors.primary}, ${colors.accent});
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+  border: 2px solid transparent;
   border-radius: 8px;
+
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  border: 1px solid ${colors.lightGray};
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
