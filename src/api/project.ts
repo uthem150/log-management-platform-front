@@ -32,5 +32,17 @@ export const projectApi = {
 
   // 대시보드 연결 상태 확인
   checkDashboardStatus: (id: string) =>
-    api.get<{ status: string }>(`/projects/${id}/dashboard/status`)
+    api.get<{ status: string }>(`/projects/${id}/dashboard/status`),
+
+  // 파일 다운로드 링크 생성 (프로젝트 생성 시)
+  generateDownloadLink: (data: CreateProjectRequest) =>
+    api.post<{ downloadUrl: string; projectId: string }>("/projects/generate-config", data),
+
+  // Grafana 대시보드 생성
+  createGrafanaDashboard: (projectId: string) =>
+    api.post<{ dashboardUrl: string; success: boolean }>(`/projects/${projectId}/grafana`),
+
+  // 파일 다운로드 상태 확인
+  checkDownloadStatus: (projectId: string) =>
+    api.get<{ downloaded: boolean; timestamp?: string }>(`/projects/${projectId}/download-status`)
 };
