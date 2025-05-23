@@ -69,8 +69,11 @@ export interface Step1Request {
 }
 
 export interface Step1Response {
-  project_id: string;
-  set_up_script_url: string;
+  data: {
+    project_id: string;
+    set_up_script_url: string;
+  };
+  message: string;
 }
 
 export interface Step2Request {

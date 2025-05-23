@@ -246,15 +246,6 @@ const CreateProject = () => {
 
   // 인증 상태 디버깅
   useEffect(() => {
-    console.log("CreateProject Auth Debug:", {
-      isAuthenticated,
-      hasToken: !!token,
-      tokenLength: token?.length,
-      user,
-      localStorage_token: localStorage.getItem("token"),
-      localStorage_auth: localStorage.getItem("auth-storage")
-    });
-
     // 토큰이 없으면 로그인 페이지로 리다이렉트
     if (!token) {
       console.warn("No token found, redirecting to login");
@@ -539,11 +530,14 @@ const CreateProject = () => {
 
       // Step1 API 호출
       const step1Response = await projectApi.createLogProjectStep1(step1Data);
+      console.log("Step1 Response:", step1Response);
 
-      console.log("Step1 Response:", step1Response.data);
+      // API 응답 구조에 맞게 수정
+      const responseData = step1Response.data.data || step1Response.data;
 
-      setProjectId(step1Response.data.project_id);
-      setDownloadUrl(step1Response.data.set_up_script_url);
+      // 상태 업데이트
+      setProjectId(responseData.project_id);
+      setDownloadUrl(responseData.set_up_script_url);
 
       // 다운로드 안내 화면으로 이동
       setProcessingStep("download");
@@ -571,8 +565,8 @@ const CreateProject = () => {
       // Step2 API 호출
       await projectApi.createLogProjectStep2({ project_id: projectId });
 
-      // 성공 화면으로 이동 (실제 대시보드 URL은 별도 API로 조회해야 할 수 있음)
-      setDashboardUrl(`/dashboard/${projectId}`); // 임시 URL
+      // 성공 화면으로 이동
+      setDashboardUrl(`/dashboard`);
       setProcessingStep("success");
     } catch (error) {
       console.error("Error in Step2:", error);

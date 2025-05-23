@@ -79,9 +79,30 @@ const DownloadGuide: React.FC<DownloadGuideProps> = ({
   onCancel
 }) => {
   const handleDownload = () => {
+    if (!downloadUrl) {
+      alert("다운로드 URL이 없습니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
     // 새 탭에서 다운로드 링크 열기
     window.open(downloadUrl, "_blank");
   };
+
+  // props 검증 추가
+  if (!projectId || !downloadUrl) {
+    return (
+      <Container>
+        <IconContainer>⚠️</IconContainer>
+        <Title>데이터 로딩 중...</Title>
+        <Description>프로젝트 정보를 불러오고 있습니다. 잠시만 기다려주세요.</Description>
+        <ButtonGroup>
+          <Button variant="secondary" onClick={onCancel}>
+            취소
+          </Button>
+        </ButtonGroup>
+      </Container>
+    );
+  }
 
   const getInstallSteps = () => {
     if (platform === "windows") {
@@ -104,10 +125,15 @@ const DownloadGuide: React.FC<DownloadGuideProps> = ({
   };
 
   const copyProjectId = () => {
-    navigator.clipboard.writeText(projectId);
-    alert("프로젝트 ID가 클립보드에 복사되었습니다.");
-  };
+    if (!projectId) {
+      alert("프로젝트 ID가 없습니다.");
+      return;
+    }
 
+    navigator.clipboard.writeText(projectId).then(() => {
+      alert("프로젝트 ID가 클립보드에 복사되었습니다.");
+    });
+  };
   return (
     <Container>
       <IconContainer>📥</IconContainer>
