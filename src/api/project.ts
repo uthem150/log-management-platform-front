@@ -5,7 +5,10 @@ import {
   CreateProjectRequest,
   UpdateProjectRequest,
   ProjectListResponse,
-  ProjectResponse
+  ProjectResponse,
+  Step1Request,
+  Step1Response,
+  Step2Request
 } from "../types/project";
 
 export const projectApi = {
@@ -41,6 +44,11 @@ export const projectApi = {
   // Grafana 대시보드 생성
   createGrafanaDashboard: (projectId: string) =>
     api.post<{ dashboardUrl: string; success: boolean }>(`/projects/${projectId}/grafana`),
+
+  createLogProjectStep1: (data: Step1Request) =>
+    api.post<Step1Response>("/monitoring/log-project/step1", data),
+
+  createLogProjectStep2: (data: Step2Request) => api.post("/monitoring/log-project/step2", data),
 
   // 파일 다운로드 상태 확인
   checkDownloadStatus: (projectId: string) =>

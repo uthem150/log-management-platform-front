@@ -1,5 +1,5 @@
 // src/pages/EditProject/CreateProject.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -75,6 +75,15 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import Accordion from "../../components/common/Accordion/Accordion";
 import { projectApi } from "../../api/project";
+import {
+  FilterConditionWithId,
+  OperatorEnum,
+  PlatformEnum,
+  Step1Request
+} from "../../types/project";
+import PlatformSelector from "../../components/project/PlatformSelector";
+import axios from "axios";
+import useAuthStore from "../../store/useAuthStore";
 
 // 로그 타입 정의
 type LogType = "json" | "plainText" | "csv" | "xml";
@@ -96,14 +105,6 @@ interface Field {
   id: string;
   name: string;
   path: string;
-}
-
-// 필터 조건 인터페이스
-interface FilterCondition {
-  id: string;
-  field: string;
-  operator: "equals" | "notEquals";
-  value: string;
 }
 
 // 기본 필드 상수 정의
@@ -215,7 +216,7 @@ const CreateProject = () => {
     { id: "2", name: "logLevel", path: "data.level" },
     { id: "3", name: "message", path: "data.message" }
   ]);
-  const [filterConditions, setFilterConditions] = useState<FilterCondition[]>([]);
+  const [filterConditions, setFilterConditions] = useState<FilterConditionWithId[]>([]);
   const [logSample, setLogSample] = useState("");
 
   // 멀티라인 관련 상태
@@ -225,9 +226,11 @@ const CreateProject = () => {
   const [processingStep, setProcessingStep] = useState<
     "form" | "generating" | "download" | "grafana-creating" | "success"
   >("form");
-  const [downloadUrl, setDownloadUrl] = useState<string>("");
   const [projectId, setProjectId] = useState<string>("");
   const [dashboardUrl, setDashboardUrl] = useState<string>("");
+
+  const [platform, setPlatform] = useState<PlatformEnum>("linux");
+  const [downloadUrl, setDownloadUrl] = useState<string>("");
 
   const {
     register,
@@ -239,6 +242,26 @@ const CreateProject = () => {
     resolver: zodResolver(projectSchema),
     mode: "onChange" // 입력 시 실시간 유효성 검사
   });
+  const { isAuthenticated, token, user } = useAuthStore(); // token, user 추가
+
+  // 인증 상태 디버깅
+  useEffect(() => {
+    console.log("CreateProject Auth Debug:", {
+      isAuthenticated,
+      hasToken: !!token,
+      tokenLength: token?.length,
+      user,
+      localStorage_token: localStorage.getItem("token"),
+      localStorage_auth: localStorage.getItem("auth-storage")
+    });
+
+    // 토큰이 없으면 로그인 페이지로 리다이렉트
+    if (!token) {
+      console.warn("No token found, redirecting to login");
+      navigate("/login");
+      return;
+    }
+  }, [isAuthenticated, token, user, navigate]);
 
   // 실시간으로 이름 필드 감시
   const projectName = watch("name");
@@ -344,10 +367,10 @@ const CreateProject = () => {
 
   // 필터 조건 추가
   const handleAddFilterCondition = () => {
-    const newCondition: FilterCondition = {
+    const newCondition: FilterConditionWithId = {
       id: Date.now().toString(), // 임의 id 지정
       field: fields[0]?.name || "",
-      operator: "equals",
+      operator: "EQUALS",
       value: ""
     };
     setFilterConditions([...filterConditions, newCondition]);
@@ -359,7 +382,11 @@ const CreateProject = () => {
   };
 
   // 필터 조건 업데이트
-  const handleFilterConditionChange = (id: string, key: keyof FilterCondition, value: string) => {
+  const handleFilterConditionChange = (
+    id: string,
+    key: keyof FilterConditionWithId,
+    value: string
+  ) => {
     setFilterConditions(
       filterConditions.map(condition =>
         condition.id === id ? { ...condition, [key]: value } : condition
@@ -408,76 +435,148 @@ const CreateProject = () => {
 
   const onSubmit = async (data: ProjectFormData) => {
     setApiError(null);
+
+    // 필수 데이터 검증
+    if (!data.collectionPath) {
+      setApiError("수집 경로를 입력해주세요.");
+      return;
+    }
+
+    if (!data.name) {
+      setApiError("프로젝트 이름을 입력해주세요.");
+      return;
+    }
+
+    if (fields.length === 0) {
+      setApiError("최소 하나 이상의 필드가 필요합니다.");
+      return;
+    }
+
     setProcessingStep("generating");
 
     try {
-      // 필드 데이터 준비
-      const processedFields = fields
-        .filter(field => field.name) // 이름이 있는 필드만 포함
-        .map(field => {
-          // Plain Text일 경우 path 속성 제외
-          if (logType === "plainText") {
-            return { name: field.name };
-          }
-          // 다른 포맷일 경우 name과 path 모두 포함
-          return { name: field.name, path: field.path };
-        });
-
-      // 프로젝트 데이터 구성
-      const projectData = {
-        name: data.name,
-        description: data.description,
-        logConfig: {
-          logType,
-          collectionPath: data.collectionPath,
-          fields: processedFields,
-          filterConditions: filterConditions.filter(condition => condition.value),
-          // 멀티라인 설정
-          multiline:
-            logType === "plainText" && multilineEnabled
-              ? {
-                  pattern: multilinePattern,
-                  match: "pattern" // 패턴 매칭 방식
-                }
-              : null
-        }
+      // 로그 타입별 기본 필드 설정
+      const getTimestampField = () => {
+        const timestampField = fields.find(f => f.name === "timestamp");
+        return timestampField?.name || "timestamp";
       };
-      // API 전송용 로그
-      console.log("Submitting project:", projectData);
 
-      // 파일 다운로드 링크 생성
-      // const downloadResponse = await projectApi.generateDownloadLink(projectData);
-
-      // 테스트용 주석
-      const downloadResponse = {
-        data: {
-          downloadUrl: "https://example.com/download/file.zip",
-          projectId: "project-12345"
+      const getTimestampJsonPath = () => {
+        if (logType === "json") {
+          const timestampField = fields.find(f => f.name === "timestamp");
+          return timestampField?.path || "data.timestamp";
         }
+        return "";
       };
-      setDownloadUrl(downloadResponse.data.downloadUrl);
-      setProjectId(downloadResponse.data.projectId);
+
+      const getLogLevelField = () => {
+        const logLevelField = fields.find(f => f.name === "logLevel");
+        return logLevelField?.name || "logLevel";
+      };
+
+      const getLogLevelJsonPath = () => {
+        if (logType === "json") {
+          const logLevelField = fields.find(f => f.name === "logLevel");
+          return logLevelField?.path || "data.level";
+        }
+        return "";
+      };
+
+      // Step1 데이터 준비 - API 스펙에 맞춰 정확히 구성
+      const step1Data: Step1Request = {
+        log_paths: [data.collectionPath],
+        project_name: data.name,
+        project_description: data.description || "",
+
+        // 멀티라인 패턴 - plainText이고 활성화된 경우만
+        multiline_pattern: logType === "plainText" && multilineEnabled ? multilinePattern : "",
+
+        // 타임스탬프 관련
+        timestamp_field: getTimestampField(),
+        timestamp_json_path: getTimestampJsonPath(),
+
+        // 로그 레벨 관련
+        log_level: getLogLevelField(),
+        log_level_json_path: getLogLevelJsonPath(),
+
+        // JSON 커스텀 필드 - JSON 타입일 때만
+        custom_json_fields:
+          logType === "json"
+            ? fields
+                .filter(
+                  field =>
+                    !["timestamp", "logLevel"].includes(field.name) && field.name && field.path
+                )
+                .map(field => ({
+                  name: field.name,
+                  json_path: field.path
+                }))
+            : [],
+
+        // Plain Text 커스텀 필드 - Plain Text 타입일 때만
+        custom_plain_fields:
+          logType === "plainText"
+            ? fields
+                .filter(field => !["timestamp", "logLevel"].includes(field.name) && field.name)
+                .map(field => field.name)
+            : [],
+
+        // 필터 조건
+        filters: filterConditions
+          .filter(condition => condition.field && condition.value)
+          .map(condition => ({
+            field: condition.field,
+            operator: condition.operator,
+            value: condition.value
+          })),
+
+        // 플랫폼
+        platform: platform
+      };
+
+      // 요청 데이터 로깅
+      console.log("Step1 Request Data:", JSON.stringify(step1Data, null, 2));
+
+      // Step1 API 호출
+      const step1Response = await projectApi.createLogProjectStep1(step1Data);
+
+      console.log("Step1 Response:", step1Response.data);
+
+      setProjectId(step1Response.data.project_id);
+      setDownloadUrl(step1Response.data.set_up_script_url);
 
       // 다운로드 안내 화면으로 이동
       setProcessingStep("download");
     } catch (error) {
-      console.error("Error generating download link:", error);
-      setApiError("설정 파일 생성 중 오류가 발생했습니다.");
+      console.error("Error in Step1:", error);
+
+      if (axios.isAxiosError(error)) {
+        console.error("Error response:", error.response?.data);
+        console.error("Error status:", error.response?.status);
+        console.error("Error headers:", error.response?.headers);
+      } else {
+        console.error("알 수 없는 에러 발생:", error);
+      }
+
+      setApiError("프로젝트 생성 중 오류가 발생했습니다.");
       setProcessingStep("form");
     }
   };
 
-  // Grafana 대시보드 생성 함수
+  // Grafana 대시보드 생성 함수 (Step2 호출)
   const handleCreateGrafana = async () => {
     setProcessingStep("grafana-creating");
 
     try {
-      const grafanaResponse = await projectApi.createGrafanaDashboard(projectId);
-      setDashboardUrl(grafanaResponse.data.dashboardUrl);
+      // Step2 API 호출
+      await projectApi.createLogProjectStep2({ project_id: projectId });
+
+      // 성공 화면으로 이동 (실제 대시보드 URL은 별도 API로 조회해야 할 수 있음)
+      setDashboardUrl(`/dashboard/${projectId}`); // 임시 URL
       setProcessingStep("success");
     } catch (error) {
-      console.error("Error creating Grafana dashboard:", error);
-      setApiError("Grafana 대시보드 생성 중 오류가 발생했습니다.");
+      console.error("Error in Step2:", error);
+      setApiError("대시보드 생성 중 오류가 발생했습니다.");
       setProcessingStep("download");
     }
   };
@@ -615,6 +714,8 @@ const CreateProject = () => {
                     </LogTypeButton>
                   </LogTypeSelector>
                 </div>
+
+                <PlatformSelector value={platform} onChange={setPlatform} />
 
                 <ButtonGroup>
                   <Button variant="secondary" onClick={handlePrevStep}>
@@ -830,12 +931,12 @@ const CreateProject = () => {
                             handleFilterConditionChange(
                               condition.id,
                               "operator",
-                              e.target.value as "equals" | "notEquals"
+                              e.target.value as OperatorEnum // 타입 캐스팅
                             )
                           }
                         >
-                          <option value="equals">equals</option>
-                          <option value="notEquals">not equals</option>
+                          <option value="EQUALS">equals</option>
+                          <option value="NOT_EQUALS">not equals</option>
                         </Select>
                       </OperatorSelect>
 
@@ -915,6 +1016,10 @@ const CreateProject = () => {
                         {logType === "xml" && "XML"}
                       </div>
                     </FieldRow>
+                    <FieldRow>
+                      <FieldLabel>설치 플랫폼</FieldLabel>
+                      <div>{platform}</div>
+                    </FieldRow>
                   </FieldContainer>
                 </Accordion>
 
@@ -954,7 +1059,7 @@ const CreateProject = () => {
                         {filterConditions.map((condition, index) => (
                           <div key={condition.id} style={{ marginBottom: "0.5rem" }}>
                             {index + 1}. {condition.field}{" "}
-                            {condition.operator === "equals" ? "=" : "!="} {condition.value}
+                            {condition.operator === "EQUALS" ? "=" : "!="} {condition.value}
                           </div>
                         ))}
                       </FieldContainer>
@@ -988,8 +1093,10 @@ const CreateProject = () => {
 
       {processingStep === "download" && (
         <DownloadGuide
+          projectId={projectId}
           downloadUrl={downloadUrl}
           projectName={getValues("name") || ""}
+          platform={platform}
           onNext={handleCreateGrafana}
           onCancel={handleCancel}
         />

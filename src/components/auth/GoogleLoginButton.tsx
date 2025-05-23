@@ -5,6 +5,7 @@ import { useState } from "react";
 import { authApi } from "../../api/auth";
 import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
 
 const GoogleButton = styled.button`
   display: flex;
@@ -42,18 +43,45 @@ const GoogleLoginButton = () => {
     onSuccess: async response => {
       setIsLoading(true);
       try {
-        // 백엔드 서버로 액세스 토큰 전송
-        const result = await authApi.googleLogin({
-          token: response.access_token
-        });
+        console.log("Google login success, access_token:", response.access_token);
 
-        // 사용자 정보와 JWT 토큰 저장
-        login(result.data.user, result.data.token);
+        // 1. OAuth 토큰으로 백엔드 인증
+        const authResult = await authApi.googleLogin(response.access_token);
+        console.log("OAuth response:", authResult.data);
 
-        // 홈페이지로 리디렉션
+        // 2. 토큰 추출
+        const { access: accessToken, refresh: refreshToken } = authResult.data.data;
+
+        console.log("Extracted tokens:", { accessToken, refreshToken });
+
+        if (!accessToken) {
+          throw new Error("No access token received from backend");
+        }
+
+        // 3. localStorage에 저장
+        localStorage.setItem("token", accessToken);
+        localStorage.setItem("refresh_token", refreshToken);
+
+        // 더미 사용자 정보
+        const userInfo = {
+          id: "unknown",
+          email: "user@example.com",
+          name: "User"
+        };
+
+        // 5. Zustand store에 저장
+        login(userInfo, accessToken);
+
+        // 6. 홈페이지로 리디렉션
         navigate("/");
-      } catch (error) {
+      } catch (err) {
+        const error = err as AxiosError;
         console.error("Google login failed:", error);
+
+        if (error.response) {
+          console.error("Error status:", error.response.status);
+          console.error("Error data:", error.response.data);
+        }
       } finally {
         setIsLoading(false);
       }

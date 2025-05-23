@@ -21,12 +21,19 @@ export interface AuthResponse {
   token: string;
 }
 
+export interface OAuthResponse {
+  data: {
+    access: string;
+    refresh: string;
+  };
+  message: string;
+}
 export interface GoogleLoginRequest {
   token: string;
 }
 
 export interface GithubLoginRequest {
-  code: string;
+  token: string;
 }
 
 export const authApi = {
@@ -38,7 +45,7 @@ export const authApi = {
 
   getCurrentUser: () => api.get<AuthResponse>("/auth/me"),
 
-  googleLogin: (data: GoogleLoginRequest) => api.post<AuthResponse>("/user/login/google", data),
+  googleLogin: (token: string) => api.post<OAuthResponse>("/user/login/google", { token }),
 
-  githubLogin: (data: GithubLoginRequest) => api.post<AuthResponse>("/user/login/github", data)
+  githubLogin: (token: string) => api.post<OAuthResponse>("/user/login/github", { token })
 };

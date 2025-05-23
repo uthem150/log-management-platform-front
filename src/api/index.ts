@@ -17,6 +17,13 @@ api.interceptors.request.use(
   config => {
     // 토큰이 있으면 요청 헤더에 추가
     const token = localStorage.getItem("token");
+    console.log("API Request:", {
+      url: config.url,
+      method: config.method,
+      hasToken: !!token,
+      token: token ? `${token.substring(0, 20)}...` : null
+    });
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -33,6 +40,12 @@ api.interceptors.response.use(
     return response;
   },
   error => {
+    console.error("API Error:", {
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url
+    });
+
     // 오류 처리 (예: 401 에러 시 로그아웃 로직)
     if (error.response && error.response.status === 401) {
       // 인증 오류 처리
