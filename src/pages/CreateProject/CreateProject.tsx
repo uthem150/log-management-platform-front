@@ -227,7 +227,6 @@ const CreateProject = () => {
     "form" | "generating" | "download" | "grafana-creating" | "success"
   >("form");
   const [projectId, setProjectId] = useState<string>("");
-  const [dashboardUrl, setDashboardUrl] = useState<string>("");
 
   const [platform, setPlatform] = useState<PlatformEnum>("linux");
   const [downloadUrl, setDownloadUrl] = useState<string>("");
@@ -563,10 +562,10 @@ const CreateProject = () => {
 
     try {
       // Step2 API 호출
-      await projectApi.createLogProjectStep2({ project_id: projectId });
+      const step2Response = await projectApi.createLogProjectStep2({ project_id: projectId });
+      console.log("Step2 Response:", step2Response);
 
       // 성공 화면으로 이동
-      setDashboardUrl(`/dashboard`);
       setProcessingStep("success");
     } catch (error) {
       console.error("Error in Step2:", error);
@@ -579,11 +578,6 @@ const CreateProject = () => {
   const handleCancel = () => {
     setProcessingStep("form");
     setCurrentStep(4); // 확인 단계로 돌아가기
-  };
-
-  // 대시보드 보기 핸들러
-  const handleViewDashboard = () => {
-    window.open(dashboardUrl, "_blank");
   };
 
   // 프로젝트 목록으로 이동 핸들러
@@ -1104,12 +1098,7 @@ const CreateProject = () => {
       )}
 
       {processingStep === "success" && (
-        <GrafanaSuccess
-          projectName={getValues("name") || ""}
-          dashboardUrl={dashboardUrl}
-          onViewDashboard={handleViewDashboard}
-          onGoToProjects={handleGoToProjects}
-        />
+        <GrafanaSuccess projectName={getValues("name") || ""} onGoToProjects={handleGoToProjects} />
       )}
 
       {apiError && processingStep !== "form" && (

@@ -43,17 +43,6 @@ const DashboardTitle = styled.h3`
   font-size: 1.2rem;
 `;
 
-const DashboardUrl = styled.div`
-  background-color: #f8f9fa;
-  border: 1px solid ${colors.lightGray};
-  border-radius: 4px;
-  padding: 1rem;
-  margin: 1rem 0;
-  font-family: monospace;
-  word-break: break-all;
-  color: ${colors.text};
-`;
-
 const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
@@ -63,22 +52,10 @@ const ButtonGroup = styled.div`
 
 interface GrafanaSuccessProps {
   projectName: string;
-  dashboardUrl: string;
-  onViewDashboard: () => void;
   onGoToProjects: () => void;
 }
 
-const GrafanaSuccess: React.FC<GrafanaSuccessProps> = ({
-  projectName,
-  dashboardUrl,
-  onViewDashboard,
-  onGoToProjects
-}) => {
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(dashboardUrl);
-    alert("대시보드 URL이 클립보드에 복사되었습니다.");
-  };
-
+const GrafanaSuccess: React.FC<GrafanaSuccessProps> = ({ projectName, onGoToProjects }) => {
   return (
     <Container>
       <IconContainer>🎉</IconContainer>
@@ -95,22 +72,13 @@ const GrafanaSuccess: React.FC<GrafanaSuccessProps> = ({
         <DashboardTitle>📊 Grafana 대시보드</DashboardTitle>
 
         <p style={{ marginBottom: "1rem", color: colors.text }}>
-          아래 URL에서 프로젝트의 로그 대시보드에 접근할 수 있습니다:
+          생성이 완료되면 프로젝트 목록에서 로그 대시보드가 추가됩니다
         </p>
-
-        <DashboardUrl>{dashboardUrl}</DashboardUrl>
-
-        <Button variant="secondary" onClick={copyToClipboard} style={{ marginTop: "0.5rem" }}>
-          📋 URL 복사
-        </Button>
       </DashboardSection>
 
       <ButtonGroup>
         <Button variant="secondary" onClick={onGoToProjects}>
           프로젝트 목록으로
-        </Button>
-        <Button variant="primary" onClick={onViewDashboard}>
-          대시보드 보기
         </Button>
       </ButtonGroup>
     </Container>

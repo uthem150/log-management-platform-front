@@ -150,24 +150,6 @@ const DownloadGuide: React.FC<DownloadGuideProps> = ({
       <DownloadSection>
         <DownloadTitle>📋 설치 가이드</DownloadTitle>
 
-        <div
-          style={{
-            marginBottom: "1rem",
-            padding: "0.75rem",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "4px"
-          }}
-        >
-          <strong>프로젝트 ID:</strong> {projectId}
-          <Button
-            variant="secondary"
-            onClick={copyProjectId}
-            style={{ marginLeft: "0.5rem", padding: "0.25rem 0.5rem", fontSize: "0.8rem" }}
-          >
-            복사
-          </Button>
-        </div>
-
         <StepList>
           {getInstallSteps().map((step, index) => (
             <li key={index}>{step}</li>
