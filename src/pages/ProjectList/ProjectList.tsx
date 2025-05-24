@@ -28,7 +28,8 @@ const ProjectList = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   const { projects, isLoading, error, fetchProjects } = useProjectStore();
-  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
 
   // 대시보드 생성 완료 시 프로젝트 목록 새로고침
   const handleDashboardCompleted = useCallback(() => {
@@ -44,24 +45,7 @@ const ProjectList = () => {
     if (isAuthenticated) {
       fetchProjects();
     }
-  }, [isAuthenticated]); // fetchProjects 의존성 제거
-
-  // 폴링 시작 (별도 useEffect로 분리)
-  useEffect(() => {
-    if (isAuthenticated) {
-      // URL 파라미터에서 대시보드 생성 요청 확인
-      const shouldStartPolling = searchParams.get("dashboardCreating");
-      if (shouldStartPolling === "true") {
-        // URL 파라미터 정리
-        const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.delete("dashboardCreating");
-        setSearchParams(newSearchParams);
-      }
-
-      // 폴링 시작 (URL 파라미터와 관계없이 항상 시작)
-      startPolling();
-    }
-  }, [isAuthenticated]); // startPolling, searchParams, setSearchParams 의존성 제거
+  }, [isAuthenticated]);
 
   // 프로젝트 카드 클릭시 상세 페이지로 이동
   const handleProjectClick = useCallback(
@@ -76,11 +60,37 @@ const ProjectList = () => {
     navigate("/projects/create");
   }, [navigate]);
 
-  // 날짜 포맷팅 함수
-  const formatDate = useCallback((dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  }, []);
+  // 상태에 따른 뱃지 색상 반환
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case "READY":
+        return "#72b01d"; // green
+      case "IN_PROGRESS":
+        return "#4361ee"; // blue
+      case "INITIATED":
+        return "#f77f00"; // orange
+      case "FAILED":
+        return "#f72585"; // red
+      default:
+        return "#6c757d"; // gray
+    }
+  };
+
+  // 상태 한글 변환
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "READY":
+        return "사용 가능";
+      case "IN_PROGRESS":
+        return "설정 중";
+      case "INITIATED":
+        return "초기화 중";
+      case "FAILED":
+        return "실패";
+      default:
+        return status;
+    }
+  };
 
   // Toast 메시지 생성
   const getToastMessage = useCallback(() => {
@@ -151,14 +161,14 @@ const ProjectList = () => {
             {projects.map(project => (
               <ProjectCard key={project.id} onClick={() => handleProjectClick(project.id)}>
                 <ProjectName>{project.name}</ProjectName>
-                <Badge>{project.status}</Badge>
-                {project.dashboardId && <Badge>Dashboard</Badge>}
+                <Badge style={{ backgroundColor: getStatusBadgeColor(project.status) }}>
+                  {getStatusText(project.status)}
+                </Badge>
+                {project.dashboard && <Badge>Dashboard</Badge>}
                 <ProjectDescription>
                   {project.description || t("projects.noDescription")}
                 </ProjectDescription>
-                <ProjectDate>
-                  {t("projects.created")}: {formatDate(project.createdAt)}
-                </ProjectDate>
+                <ProjectDate>프로젝트 타입: {project.project_type}</ProjectDate>
               </ProjectCard>
             ))}
           </ProjectGrid>

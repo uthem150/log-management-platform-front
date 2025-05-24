@@ -1,42 +1,58 @@
 // src/types/project.ts
 
-export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-  owner: string;
-  dashboardId?: string; // Grafana 대시보드 ID
-  dashboardUrl?: string; // Grafana 대시보드 URL
-  status: ProjectStatus;
-}
-
-export type ProjectStatus = "active" | "inactive" | "configuring";
-
-export interface CreateProjectRequest {
-  name: string;
-  description?: string;
-}
-
-export interface UpdateProjectRequest {
-  name?: string;
-  description?: string;
-  status?: ProjectStatus;
-}
-
-export interface ProjectListResponse {
-  projects: Project[];
-  totalCount: number;
-}
-
-export interface ProjectResponse {
-  project: Project;
-}
-
+export type ProjectStatus = "INITIATED" | "IN_PROGRESS" | "READY" | "FAILED";
 export type PlatformEnum = "windows" | "linux";
 export type OperatorEnum = "EQUALS" | "NOT_EQUALS";
 
+// Dashboard 타입
+export interface Dashboard {
+  id: string;
+  uid: string | null;
+  title: string;
+  folder_uid: string;
+  url: string | null;
+  panels: undefined[];
+  tags: string[];
+  data_sources: string[];
+}
+
+export interface PublicDashboard {
+  id: string;
+  uid: string;
+  public_url: string;
+  project_id: string;
+  dashboard_id: string;
+}
+
+export interface Project {
+  id: string;
+  user_id: string;
+  name: string;
+  project_type: string;
+  status: ProjectStatus;
+  service_account_id: string | null;
+  description: string | null;
+  user_folder_id: string | null;
+  dashboard: Dashboard | null;
+  public_dashboard: PublicDashboard | null;
+}
+
+export interface ProjectListData {
+  items: Project[];
+  total_items: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
+  has_previous: boolean;
+  has_next: boolean;
+}
+
+export interface ProjectListResponse {
+  data: ProjectListData;
+  message: string;
+}
+
+// Step1, Step2 관련 타입들
 export interface JsonFieldMapping {
   name: string;
   json_path: string;
@@ -68,11 +84,13 @@ export interface Step1Request {
   platform: PlatformEnum;
 }
 
+export interface Step1ResponseData {
+  project_id: string;
+  set_up_script_url: string;
+}
+
 export interface Step1Response {
-  data: {
-    project_id: string;
-    set_up_script_url: string;
-  };
+  data: Step1ResponseData;
   message: string;
 }
 

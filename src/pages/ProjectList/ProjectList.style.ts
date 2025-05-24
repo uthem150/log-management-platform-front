@@ -58,6 +58,8 @@ export const ProjectName = styled.h3`
 export const ProjectDescription = styled.p`
   color: ${colors.text};
   font-size: 0.9rem;
+  margin-top: 1rem;
+
   margin-bottom: 1rem;
 
   /* 3줄 이상이면 말줄임표 */

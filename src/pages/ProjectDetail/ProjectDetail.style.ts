@@ -23,7 +23,8 @@ export const Title = styled.h1`
 
 export const Description = styled.p`
   color: ${colors.gray};
-  margin-bottom: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
   max-width: 70%;
 `;
 
@@ -50,14 +51,16 @@ export const StatusBadge = styled.span<{ status: string }>`
   margin-left: 1rem;
   background-color: ${props => {
     switch (props.status) {
-      case "active":
-        return colors.success;
-      case "inactive":
-        return colors.gray;
-      case "configuring":
-        return colors.warning;
+      case "READY":
+        return "#72b01d";
+      case "IN_PROGRESS":
+        return "#4361ee";
+      case "INITIATED":
+        return "#f77f00";
+      case "FAILED":
+        return "#f72585";
       default:
-        return colors.accent;
+        return "#6c757d";
     }
   }};
   color: white;

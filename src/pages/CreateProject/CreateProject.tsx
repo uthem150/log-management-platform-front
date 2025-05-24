@@ -207,7 +207,7 @@ function SortableField({
 const CreateProject = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { createProject, isLoading } = useProjectStore();
+  const { isLoading } = useProjectStore();
   const [apiError, setApiError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [logType, setLogType] = useState<LogType>("json");
@@ -562,6 +562,8 @@ const CreateProject = () => {
 
     try {
       // Step2 API 호출
+      console.log("Step2 Request project ID:", projectId);
+
       const step2Response = await projectApi.createLogProjectStep2({ project_id: projectId });
       console.log("Step2 Response:", step2Response);
 
