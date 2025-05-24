@@ -50,7 +50,7 @@ const useProjectStore = create<ProjectState>((set, get) => ({
   hasPrevious: false,
   hasNext: false,
 
-  fetchProjects: async (page = 2, pageSize = 10) => {
+  fetchProjects: async (page = 1, pageSize = 10) => {
     set({ isLoading: true, error: null });
     try {
       console.log(`Fetching projects: page=${page}, pageSize=${pageSize}`);

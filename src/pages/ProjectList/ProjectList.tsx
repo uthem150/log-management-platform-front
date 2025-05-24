@@ -6,6 +6,7 @@ import useProjectStore from "../../store/useProjectStore";
 import useAuthStore from "../../store/useAuthStore";
 import Button from "../../components/common/Button";
 import Toast from "../../components/common/Toast";
+import Pagination from "../../components/common/Pagination";
 import { useDashboardPolling } from "../../hooks/useDashboardPolling";
 import {
   Badge,
@@ -27,27 +28,63 @@ const ProjectList = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const { projects, isLoading, error, fetchProjects } = useProjectStore();
+  const {
+    projects,
+    isLoading,
+    error,
+    fetchProjects,
+    // 페이징 정보
+    totalItems,
+    totalPages,
+    currentPage,
+    pageSize,
+    hasPrevious,
+    hasNext
+  } = useProjectStore();
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  // 폴링을 위한 상태 추가
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
 
   // 대시보드 생성 완료 시 프로젝트 목록 새로고침
   const handleDashboardCompleted = useCallback(() => {
-    fetchProjects();
-  }, [fetchProjects]);
+    // 현재 페이지 유지하면서 새로고침
+    fetchProjects(currentPage, pageSize);
+  }, [fetchProjects, currentPage, pageSize]);
 
   // 대시보드 폴링 훅 사용
   const { dashboardStatus, toastVisible, startPolling, hideToast } =
     useDashboardPolling(handleDashboardCompleted);
 
-  // 컴포넌트 마운트시 프로젝트 목록 조회 (한 번만 실행)
+  // 컴포넌트 마운트시 프로젝트 목록 조회
   useEffect(() => {
     if (isAuthenticated) {
-      fetchProjects();
-    }
-  }, [isAuthenticated]);
+      // URL 파라미터에서 페이지 번호 가져오기
+      const urlPage = searchParams.get("page");
+      const pageNumber = urlPage ? parseInt(urlPage, 10) : 1;
 
-  // 프로젝트 카드 클릭시 상세 페이지로 이동
+      fetchProjects(pageNumber, pageSize);
+    }
+  }, [isAuthenticated, searchParams]); // fetchProjects, pageSize 의존성 제거
+
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback(
+    (page: number) => {
+      // URL 파라미터 업데이트
+      const newSearchParams = new URLSearchParams(searchParams);
+      if (page === 1) {
+        newSearchParams.delete("page");
+      } else {
+        newSearchParams.set("page", page.toString());
+      }
+      setSearchParams(newSearchParams);
+
+      // 프로젝트 목록 조회
+      fetchProjects(page, pageSize);
+    },
+    [fetchProjects, pageSize, searchParams, setSearchParams]
+  );
+
   const handleProjectClick = useCallback(
     (id: string) => {
       navigate(`/projects/${id}`);
@@ -132,6 +169,12 @@ const ProjectList = () => {
         <Header>
           <div>
             <Title>{t("projects.title")}</Title>
+            {/* 총 프로젝트 수 표시 */}
+            {totalItems > 0 && (
+              <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.9rem", color: "#666" }}>
+                총 {totalItems}개의 프로젝트
+              </p>
+            )}
           </div>
           <CreateProjectButton onClick={handleCreateProject}>
             {t("projects.createNew")}
@@ -148,7 +191,9 @@ const ProjectList = () => {
           <EmptyState>
             <h3>{t("common.error")}</h3>
             <p>{error}</p>
-            <Button onClick={() => fetchProjects()}>{t("common.retry")}</Button>
+            <Button onClick={() => fetchProjects(currentPage, pageSize)}>
+              {t("common.retry")}
+            </Button>
           </EmptyState>
         ) : projects.length === 0 ? (
           <EmptyState>
@@ -157,21 +202,33 @@ const ProjectList = () => {
             <Button onClick={handleCreateProject}>{t("projects.createNew")}</Button>
           </EmptyState>
         ) : (
-          <ProjectGrid>
-            {projects.map(project => (
-              <ProjectCard key={project.id} onClick={() => handleProjectClick(project.id)}>
-                <ProjectName>{project.name}</ProjectName>
-                <Badge style={{ backgroundColor: getStatusBadgeColor(project.status) }}>
-                  {getStatusText(project.status)}
-                </Badge>
-                {project.dashboard && <Badge>Dashboard</Badge>}
-                <ProjectDescription>
-                  {project.description || t("projects.noDescription")}
-                </ProjectDescription>
-                <ProjectDate>프로젝트 타입: {project.project_type}</ProjectDate>
-              </ProjectCard>
-            ))}
-          </ProjectGrid>
+          <>
+            <ProjectGrid>
+              {projects.map(project => (
+                <ProjectCard key={project.id} onClick={() => handleProjectClick(project.id)}>
+                  <ProjectName>{project.name}</ProjectName>
+                  <Badge style={{ backgroundColor: getStatusBadgeColor(project.status) }}>
+                    {getStatusText(project.status)}
+                  </Badge>
+                  {project.dashboard && <Badge>Dashboard</Badge>}
+                  <ProjectDescription>
+                    {project.description || t("projects.noDescription")}
+                  </ProjectDescription>
+                  <ProjectDate>프로젝트 타입: {project.project_type}</ProjectDate>
+                </ProjectCard>
+              ))}
+            </ProjectGrid>
+
+            {/* 페이징 컴포넌트 */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+              isLoading={isLoading}
+            />
+          </>
         )}
       </Container>
 
