@@ -3,6 +3,7 @@ import api from "./index";
 import {
   Project,
   ProjectListResponse,
+  SingleProjectResponse,
   Step1Request,
   Step1Response,
   Step2Request
@@ -12,6 +13,10 @@ export const projectApi = {
   // 프로젝트 목록 조회 (새로운 API로 수정)
   getProjects: (page = 1, pageSize = 10) =>
     api.get<ProjectListResponse>(`/monitoring/projects/?page=${page}&page_size=${pageSize}`),
+
+  // 특정 프로젝트 조회
+  getProject: (projectId: string) =>
+    api.get<SingleProjectResponse>(`/monitoring/project/${projectId}/`),
 
   // 프로젝트 삭제
   deleteProject: (id: string) => api.delete(`/projects/${id}`),

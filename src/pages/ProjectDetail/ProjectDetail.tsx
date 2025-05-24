@@ -29,7 +29,6 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
   const { currentProject, isLoading, error, fetchProject, deleteProject } = useProjectStore();
 
-  const [isGeneratingDashboard, setIsGeneratingDashboard] = useState(false);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
 
   // 프로젝트 정보 조회
@@ -69,6 +68,11 @@ const ProjectDetail = () => {
       navigate("/projects");
     } catch (error) {
       console.error("Error deleting project:", error);
+      if (error instanceof Error) {
+        setDashboardError(error.message);
+      } else {
+        setDashboardError("알 수 없는 오류가 발생했습니다.");
+      }
       alert(t("projects.deleteError"));
     }
   };

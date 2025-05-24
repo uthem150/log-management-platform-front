@@ -20,7 +20,7 @@ interface ProjectState {
   // 프로젝트 목록 조회 (페이징 지원)
   fetchProjects: (page?: number, pageSize?: number) => Promise<void>;
 
-  // 특정 프로젝트 조회 (API 구현될 때까지 임시)
+  // 특정 프로젝트 조회
   fetchProject: (id: string) => Promise<void>;
 
   // 프로젝트 삭제
@@ -95,28 +95,55 @@ const useProjectStore = create<ProjectState>((set, get) => ({
   fetchProject: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      // 현재 프로젝트 목록에서 해당 프로젝트 찾기 (임시)
-      const { projects } = get();
-      const project = projects.find(p => p.id === id);
+      const response = await projectApi.getProject(id);
+      console.log("Single Project API Response:", response);
 
-      if (project) {
+      // API 응답 구조: response.data.data (직접 프로젝트 객체)
+      const project = response.data.data;
+
+      if (project && project.id) {
         set({ currentProject: project, isLoading: false });
       } else {
         set({ error: "프로젝트를 찾을 수 없습니다.", isLoading: false });
       }
-    } catch (error) {
-      set({ error: "프로젝트 상세 정보를 불러오는데 실패했습니다.", isLoading: false });
+    } catch (error: unknown) {
       console.error("Error fetching project:", error);
+
+      let errorMessage = "프로젝트 상세 정보를 불러오는데 실패했습니다.";
+
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as { response?: { status?: number; data?: unknown } };
+
+        if (axiosError.response?.status === 404) {
+          errorMessage = "프로젝트를 찾을 수 없습니다.";
+        } else if (axiosError.response?.status === 403) {
+          errorMessage = "프로젝트에 접근할 권한이 없습니다.";
+        } else if (axiosError.response?.status === 500) {
+          errorMessage = "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        }
+      }
+
+      set({ error: errorMessage, isLoading: false });
     }
   },
 
+  // 특정 프로젝트의 상태(status) 업데이트하는 함수
+  // - 프로젝트 목록 중 해당 ID의 프로젝트를 찾아 status만 갱신
+  // - 현재 선택된 프로젝트(currentProject)도 동일 ID면 같이 갱신
   updateProjectStatus: (projectId: string, status: ProjectStatus) => {
     set(state => ({
-      projects: state.projects.map(p => (p.id === projectId ? { ...p, status } : p)),
+      // 프로젝트 목록을 순회하면서, id가 일치하는 경우에만 status 갱신
+      projects: state.projects.map(
+        p =>
+          p.id === projectId
+            ? { ...p, status } // 해당 프로젝트만 status를 새로 덮어씀
+            : p // 나머지는 그대로 유지
+      ),
+      // 현재 선택된 프로젝트가 존재하고, 해당 ID와 일치하면 상태 갱신
       currentProject:
         state.currentProject?.id === projectId
-          ? { ...state.currentProject, status }
-          : state.currentProject
+          ? { ...state.currentProject, status } // currentProject도 갱신
+          : state.currentProject // 아니라면 기존 상태 유지
     }));
   },
 

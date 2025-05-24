@@ -52,6 +52,11 @@ export interface ProjectListResponse {
   message: string;
 }
 
+export interface SingleProjectResponse {
+  data: Project;
+  message: string;
+}
+
 // Step1, Step2 관련 타입들
 export interface JsonFieldMapping {
   name: string;

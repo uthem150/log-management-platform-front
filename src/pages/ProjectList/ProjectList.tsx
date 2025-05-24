@@ -7,7 +7,7 @@ import useAuthStore from "../../store/useAuthStore";
 import Button from "../../components/common/Button";
 import Toast from "../../components/common/Toast";
 import Pagination from "../../components/common/Pagination";
-import { useDashboardPolling } from "../../hooks/useDashboardPolling";
+import { useProjectPolling } from "../../hooks/useProjectPolling";
 import {
   Badge,
   Container,
@@ -23,6 +23,7 @@ import {
   ProjectName,
   Title
 } from "./ProjectList.style";
+import { Project } from "../../types/project";
 
 const ProjectList = () => {
   const { t } = useTranslation();
@@ -33,39 +34,72 @@ const ProjectList = () => {
     isLoading,
     error,
     fetchProjects,
+    updateProjectStatus,
     // 페이징 정보
     totalItems,
     totalPages,
     currentPage,
-    pageSize,
-    hasPrevious,
-    hasNext
+    pageSize
   } = useProjectStore();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // 폴링을 위한 상태 추가
-  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
+  // 초기 로드 완료 상태 추가
+  const [hasInitialLoad, setHasInitialLoad] = useState(false);
 
-  // 대시보드 생성 완료 시 프로젝트 목록 새로고침
-  const handleDashboardCompleted = useCallback(() => {
-    // 현재 페이지 유지하면서 새로고침
-    fetchProjects(currentPage, pageSize);
-  }, [fetchProjects, currentPage, pageSize]);
+  // 폴링 관련 상태
+  const handleProjectsUpdated = useCallback(
+    (updatedProjects: Project[]) => {
+      console.log("Updating projects from polling:", updatedProjects);
+      updatedProjects.forEach(project => {
+        updateProjectStatus(project.id, project.status);
+      });
+    },
+    [updateProjectStatus]
+  );
 
-  // 대시보드 폴링 훅 사용
-  const { dashboardStatus, toastVisible, startPolling, hideToast } =
-    useDashboardPolling(handleDashboardCompleted);
+  const { isPolling, pollingProjects, startPolling, stopPolling } =
+    useProjectPolling(handleProjectsUpdated);
 
-  // 컴포넌트 마운트시 프로젝트 목록 조회
+  // 컴포넌트 마운트시 프로젝트 목록 조회 (한 번만)
   useEffect(() => {
-    if (isAuthenticated) {
-      // URL 파라미터에서 페이지 번호 가져오기
+    if (isAuthenticated && !hasInitialLoad) {
       const urlPage = searchParams.get("page");
       const pageNumber = urlPage ? parseInt(urlPage, 10) : 1;
 
-      fetchProjects(pageNumber, pageSize);
+      console.log("Initial load - fetching projects");
+      fetchProjects(pageNumber, pageSize).then(() => {
+        setHasInitialLoad(true);
+      });
     }
-  }, [isAuthenticated, searchParams]); // fetchProjects, pageSize 의존성 제거
+  }, [isAuthenticated, hasInitialLoad]);
+
+  // 프로젝트 목록이 변경될 때 폴링 관리 (초기 로드 완료 후에만)
+  useEffect(() => {
+    if (hasInitialLoad && projects.length > 0) {
+      console.log("Projects updated, checking if polling needed:", projects.length);
+
+      // 진행 중인 프로젝트 수 확인
+      const inProgressCount = projects.filter(
+        project => project.status !== "READY" && project.status !== "FAILED"
+      ).length;
+
+      console.log("Projects in progress:", inProgressCount);
+
+      if (inProgressCount > 0) {
+        startPolling(projects);
+      } else {
+        stopPolling();
+      }
+    }
+  }, [projects, hasInitialLoad, startPolling, stopPolling]);
+
+  // 컴포넌트 언마운트 시에만 폴링 정리
+  useEffect(() => {
+    return () => {
+      console.log("Component unmounting, cleaning up polling");
+      stopPolling();
+    };
+  }, [stopPolling]);
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback(
@@ -130,24 +164,23 @@ const ProjectList = () => {
   };
 
   // Toast 메시지 생성
-  const getToastMessage = useCallback(() => {
-    const inProgressProjects = dashboardStatus.projectsInProgress;
-    if (inProgressProjects.length === 0) {
+  const getToastMessage = () => {
+    if (pollingProjects.length === 0) {
       return { title: "", description: "" };
     }
 
-    if (inProgressProjects.length === 1) {
+    if (pollingProjects.length === 1) {
       return {
-        title: "대시보드 생성 중",
-        description: `${inProgressProjects[0].projectName} 프로젝트의 대시보드를 생성하고 있습니다.`
+        title: "프로젝트 설정 중",
+        description: `${pollingProjects[0].name} 프로젝트를 설정하고 있습니다.`
       };
     }
 
     return {
-      title: "대시보드 생성 중",
-      description: `${inProgressProjects.length}개 프로젝트의 대시보드를 생성하고 있습니다.`
+      title: "프로젝트 설정 중",
+      description: `${pollingProjects.length}개 프로젝트를 설정하고 있습니다.`
     };
-  }, [dashboardStatus.projectsInProgress]);
+  };
 
   if (!isAuthenticated) {
     return (
@@ -173,6 +206,11 @@ const ProjectList = () => {
             {totalItems > 0 && (
               <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.9rem", color: "#666" }}>
                 총 {totalItems}개의 프로젝트
+                {isPolling && (
+                  <span style={{ color: "#4361ee", marginLeft: "0.5rem" }}>
+                    (설정 중: {pollingProjects.length}개)
+                  </span>
+                )}
               </p>
             )}
           </div>
@@ -234,10 +272,10 @@ const ProjectList = () => {
 
       {/* 대시보드 생성 중 Toast */}
       <Toast
-        visible={toastVisible && dashboardStatus.inProgress}
+        visible={isPolling}
         title={toastMessage.title}
         description={toastMessage.description}
-        onClose={hideToast}
+        onClose={stopPolling}
       />
     </>
   );
