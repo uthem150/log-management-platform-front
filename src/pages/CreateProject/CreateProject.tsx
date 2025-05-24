@@ -761,22 +761,6 @@ const CreateProject = () => {
                   </InfoText>
                 </InfoBox>
 
-                {logType === "plainText" && (
-                  <LogSampleContainer>
-                    <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 500 }}>
-                      로그 샘플
-                    </label>
-                    <TextArea
-                      value={logSample}
-                      onChange={e => setLogSample(e.target.value)}
-                      placeholder="로그 샘플을 입력하면 GPT가 정규식 패턴을 제안합니다."
-                    />
-                    <GptAssistButton type="button" onClick={handleGptAssist}>
-                      GPT API를 통해 정규식 생성하기
-                    </GptAssistButton>
-                  </LogSampleContainer>
-                )}
-
                 <Accordion title="필드 설정" defaultOpen={true}>
                   {/* DndContext : 드래그·드롭 기능의 최상위 컨텍스트. */}
                   {/* collisionDetection={closestCenter}: 드래그 중인 아이템과 다른 아이템 간 충돌 판정을, 리스트 아이템의 중앙을 기준으로 계산하도록 설정. */}
@@ -890,6 +874,22 @@ const CreateProject = () => {
                       )}
                     </FieldContainer>
                   </Accordion>
+                )}
+
+                {logType === "plainText" && (
+                  <LogSampleContainer>
+                    <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: 500 }}>
+                      로그 샘플
+                    </label>
+                    <TextArea
+                      value={logSample}
+                      onChange={e => setLogSample(e.target.value)}
+                      placeholder="로그 샘플을 입력하면 GPT가 정규식 패턴을 제안합니다."
+                    />
+                    <GptAssistButton type="button" onClick={handleGptAssist}>
+                      GPT API를 통해 정규식 생성하기
+                    </GptAssistButton>
+                  </LogSampleContainer>
                 )}
 
                 <Accordion title="필터링 조건 (선택)" defaultOpen={true}>
