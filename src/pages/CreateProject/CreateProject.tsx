@@ -445,33 +445,6 @@ const CreateProject = () => {
     setProcessingStep("generating");
 
     try {
-      // 로그 타입별 기본 필드 설정
-      const getTimestampField = () => {
-        const timestampField = fields.find(f => f.name === "timestamp");
-        return timestampField?.name || "timestamp";
-      };
-
-      const getTimestampJsonPath = () => {
-        if (logType === "json") {
-          const timestampField = fields.find(f => f.name === "timestamp");
-          return timestampField?.path || "data.timestamp";
-        }
-        return "";
-      };
-
-      const getLogLevelField = () => {
-        const logLevelField = fields.find(f => f.name === "logLevel");
-        return logLevelField?.name || "logLevel";
-      };
-
-      const getLogLevelJsonPath = () => {
-        if (logType === "json") {
-          const logLevelField = fields.find(f => f.name === "logLevel");
-          return logLevelField?.path || "data.level";
-        }
-        return "";
-      };
-
       // Step1 데이터 준비 - API 스펙에 맞춰 정확히 구성
       const step1Data: Step1Request = {
         log_paths: [data.collectionPath],
@@ -481,15 +454,19 @@ const CreateProject = () => {
         // 멀티라인 패턴 - plainText이고 활성화된 경우만
         multiline_pattern: logType === "plainText" && multilineEnabled ? multilinePattern : "",
 
-        // 타임스탬프 관련
-        timestamp_field: getTimestampField(),
-        timestamp_json_path: getTimestampJsonPath(),
+        // 타임스탬프 관련 (JSON 전용)
+        timestamp_field: logType === "json" ? "timestamp" : "",
+        timestamp_json_path:
+          logType === "json"
+            ? fields.find(f => f.name === "timestamp")?.path || "data.timestamp"
+            : "",
 
-        // 로그 레벨 관련
-        log_level: getLogLevelField(),
-        log_level_json_path: getLogLevelJsonPath(),
+        // 로그 레벨 관련 (JSON 전용)
+        log_level: logType === "json" ? "logLevel" : "",
+        log_level_json_path:
+          logType === "json" ? fields.find(f => f.name === "logLevel")?.path || "data.level" : "",
 
-        // JSON 커스텀 필드 - JSON 타입일 때만
+        // JSON 커스텀 필드 - JSON 타입일 때 기본 필드 제외한 모든 필드
         custom_json_fields:
           logType === "json"
             ? fields
@@ -503,11 +480,11 @@ const CreateProject = () => {
                 }))
             : [],
 
-        // Plain Text 커스텀 필드 - Plain Text 타입일 때만
+        // Plain Text 커스텀 필드 - Plain Text 타입일 때 모든 필드 (기본 필드 포함)
         custom_plain_fields:
           logType === "plainText"
             ? fields
-                .filter(field => !["timestamp", "logLevel"].includes(field.name) && field.name)
+                .filter(field => field.name) // 이름이 있는 모든 필드
                 .map(field => field.name)
             : [],
 
