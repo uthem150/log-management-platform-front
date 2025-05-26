@@ -5,6 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Log Management System</title>
+    <style>
+      /* 모든 스크롤바 숨기기 */
+      ::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Firefox용 */
+      html {
+        scrollbar-width: none;
+      }
+
+      /* body에서 스크롤 기능은 유지하되 스크롤바만 숨기기 */
+      body {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
