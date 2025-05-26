@@ -6,6 +6,10 @@ export const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 3rem 1rem;
+
+  @media (max-width: 768px) {
+    padding: 3rem 0.5rem;
+  }
 `;
 
 export const HeroSection = styled.div`
@@ -51,7 +55,7 @@ export const Title = styled.h1`
   }
 
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
   }
 `;
 
@@ -60,6 +64,10 @@ export const Subtitle = styled.p`
   color: ${colors.gray};
   margin-bottom: 2rem;
   line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
 `;
 
 export const ButtonGroup = styled.div`

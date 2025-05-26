@@ -221,6 +221,7 @@ const ProjectDetail = () => {
                 <IframeContainer>
                   <iframe
                     src={currentProject?.public_dashboard?.public_url}
+                    // src="http://localhost:3000/d/logs-dashboard-minimal/042d666?orgId=1&from=now-30m&to=now&timezone=browser&var-level=$__all&refresh=5s&kiosk=1"
                     width="100%"
                     height="100%"
                     title="Grafana Dashboard"
