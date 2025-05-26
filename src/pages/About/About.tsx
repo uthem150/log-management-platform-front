@@ -429,15 +429,15 @@ const About = () => {
         <TeamGrid>
           <TeamMember>
             <MemberImage src="https://picsum.photos/200" alt="팀원 사진" />
-            <MemberName>윤규민</MemberName>
-            <MemberRole>Developer</MemberRole>
-            <MemberBio>https://github.com/gmyun1999</MemberBio>
-          </TeamMember>
-          <TeamMember>
-            <MemberImage src="https://picsum.photos/200" alt="팀원 사진" />
             <MemberName>김도훈</MemberName>
             <MemberRole>Developer</MemberRole>
             <MemberBio>https://github.com/uthem150</MemberBio>
+          </TeamMember>
+          <TeamMember>
+            <MemberImage src="https://picsum.photos/200" alt="팀원 사진" />
+            <MemberName>윤규민</MemberName>
+            <MemberRole>Developer</MemberRole>
+            <MemberBio>https://github.com/gmyun1999</MemberBio>
           </TeamMember>
         </TeamGrid>
       </TeamSection>
