@@ -108,7 +108,7 @@ interface Field {
 }
 
 // 기본 필드 상수 정의
-const DEFAULT_FIELDS = ["timestamp", "logLevel", "message"];
+const DEFAULT_FIELDS = ["timestamp", "level", "msg_detail"];
 
 // SortableField 컴포넌트
 function SortableField({
@@ -162,7 +162,7 @@ function SortableField({
               border: "1px solid #e9ecef",
               borderRadius: "4px"
             }}
-            placeholder="timestamp, logLevel, message 등"
+            placeholder="timestamp, level, msg_detail 등"
             // 기본 필드인 경우 수정 불가
             disabled={isDefaultField}
           />
@@ -213,8 +213,8 @@ const CreateProject = () => {
   const [logType, setLogType] = useState<LogType>("json");
   const [fields, setFields] = useState<Field[]>([
     { id: "1", name: "timestamp", path: "data.timestamp" },
-    { id: "2", name: "logLevel", path: "data.level" },
-    { id: "3", name: "message", path: "data.message" }
+    { id: "2", name: "level", path: "data.level" },
+    { id: "3", name: "msg_detail", path: "data.msg_detail" }
   ]);
   const [filterConditions, setFilterConditions] = useState<FilterConditionWithId[]>([]);
   const [logSample, setLogSample] = useState("");
@@ -278,20 +278,20 @@ const CreateProject = () => {
     if (type === "json") {
       setFields([
         { id: "1", name: "timestamp", path: "data.timestamp" },
-        { id: "2", name: "logLevel", path: "data.level" },
-        { id: "3", name: "message", path: "data.message" }
+        { id: "2", name: "level", path: "data.level" },
+        { id: "3", name: "msg_detail", path: "data.msg_detail" }
       ]);
     } else if (type === "plainText") {
       setFields([
         { id: "1", name: "timestamp", path: "^\\d{4}-\\d{2}-\\d{2}" },
-        { id: "2", name: "logLevel", path: "(DEBUG|INFO|WARN|ERROR)" },
-        { id: "3", name: "message", path: ".*$" }
+        { id: "2", name: "level", path: "(DEBUG|INFO|WARN|ERROR)" },
+        { id: "3", name: "msg_detail", path: ".*$" }
       ]);
     } else {
       setFields([
         { id: "1", name: "timestamp", path: "" },
-        { id: "2", name: "logLevel", path: "" },
-        { id: "3", name: "message", path: "" }
+        { id: "2", name: "level", path: "" },
+        { id: "3", name: "msg_detail", path: "" }
       ]);
     }
   };
