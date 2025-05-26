@@ -16,6 +16,7 @@ interface AccordionProps {
   children: React.ReactNode; // 아코디언 내부에 표시할 내용
   defaultOpen?: boolean; // 기본으로 열려있을지 여부 (기본값: true)
   icon?: IconType; // 아이콘 타입 (선택 사항)
+  noMargin?: boolean;
 }
 
 // 간단한 아이콘 컴포넌트 (실제로는 적절한 아이콘 라이브러리 사용 권장)
@@ -38,11 +39,17 @@ const getIcon = (type?: IconType) => {
   }
 };
 
-const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOpen = true, icon }) => {
+const Accordion: React.FC<AccordionProps> = ({
+  title,
+  children,
+  defaultOpen = true,
+  icon,
+  noMargin = false
+}) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <AccordionSection>
+    <AccordionSection noMargin={noMargin}>
       <AccordionHeader isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
         {icon && <span style={{ marginRight: "8px" }}>{getIcon(icon)}</span>}
         {title}

@@ -15,7 +15,20 @@ export const colors = {
   black: "#000000",
   danger: "#dc3545",
   dangerDark: "#c82333",
-  red: "#FF0000"
+  red: "#FF0000",
+
+  // 경고 관련 추가 컬러
+  warningLight: "#FFF8E1", // 경고 배경색 (연한 노란색)
+  warningBorder: "#FFD54F", // 경고 테두리색 (중간 노란색)
+  warningText: "#E65100", // 경고 텍스트색 (진한 오렌지)
+  infoLight: "#E3F2FD", // 정보 배경색 (연한 파란색)
+  infoBorder: "#64B5F6", // 정보 테두리색 (중간 파란색)
+  successLight: "#E8F5E8", // 성공 배경색 (연한 초록색)
+  successBorder: "#81C784", // 성공 테두리색 (중간 초록색)
+  successText: "#2E7D32", // 성공 텍스트색 (진한 초록색)
+  errorLight: "#FFEBEE", // 에러 배경색 (연한 빨간색)
+  errorBorder: "#EF5350", // 에러 테두리색 (중간 빨간색)
+  errorText: "#C62828" // 에러 텍스트색 (진한 빨간색)
 };
 
 export const fontSizes = {

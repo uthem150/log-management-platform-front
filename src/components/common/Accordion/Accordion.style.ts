@@ -3,8 +3,8 @@
 import styled from "@emotion/styled";
 import { colors } from "../../../styles/theme";
 
-export const AccordionSection = styled.div`
-  margin-bottom: 1.5rem;
+export const AccordionSection = styled.div<{ noMargin?: boolean }>`
+  margin-bottom: ${props => (props.noMargin ? "0" : "1.5rem")};
   border: 1px solid ${colors.lightGray};
   border-radius: 8px;
   overflow: hidden; // 내부의 열고 닫는 콘텐츠가 튀어나오지 않도록 자름

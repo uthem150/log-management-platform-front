@@ -14,13 +14,18 @@ import {
   AddFieldButton,
   ButtonGroup,
   Card,
+  CompactWarningBox,
   Container,
   DragHandle,
   ErrorMessage,
   ExampleBlock,
   ExampleCaption,
+  ExampleCode,
   ExampleContent,
+  ExampleItem,
+  ExampleLabel,
   ExampleLine,
+  ExampleRow,
   ExampleTitle,
   FieldContainer,
   FieldInputContainer,
@@ -30,6 +35,7 @@ import {
   FilterCondition,
   GptAssistButton,
   HelperText,
+  HighlightCode,
   InfoBox,
   InfoText,
   InfoTitle,
@@ -44,12 +50,17 @@ import {
   SectionSubtitle,
   SectionTitle,
   Select,
+  SolutionSteps,
+  SolutionText,
+  SolutionTitle,
   Step,
   StepIndicator,
   StepNumber,
   TextArea,
   Title,
-  ValueInput
+  ValueInput,
+  WarningContent,
+  WarningText
 } from "./CreateProject.style";
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
@@ -739,6 +750,45 @@ const CreateProject = () => {
                 </InfoBox>
 
                 <Accordion title="필드 설정" defaultOpen={true}>
+                  {/* Plain Text 로그 타입일 때만 타임스탬프 경고 표시 */}
+                  {logType === "plainText" && (
+                    <CompactWarningBox>
+                      <Accordion
+                        title="⚠️ Plain Text 파싱 주의사항"
+                        defaultOpen={false}
+                        icon="info"
+                        noMargin={true}
+                      >
+                        <WarningContent>
+                          <WarningText>
+                            공백이 포함된 타임스탬프는 별도 필드가 필요할 수 있습니다.
+                          </WarningText>
+
+                          <ExampleRow>
+                            <ExampleItem type="good">
+                              <ExampleLabel type="good">✓ 정상 인식</ExampleLabel>
+                              <ExampleCode>2025-05-2603:00:29,872</ExampleCode>
+                            </ExampleItem>
+
+                            <ExampleItem type="bad">
+                              <ExampleLabel type="bad">✗ 문제 발생</ExampleLabel>
+                              <ExampleCode>2025-05-26 03:00:29,872</ExampleCode>
+                            </ExampleItem>
+                          </ExampleRow>
+
+                          <SolutionText>
+                            <SolutionTitle>💡 해결 방법</SolutionTitle>
+                            <SolutionSteps>
+                              공백 포함 시 <HighlightCode>timestamp</HighlightCode> 필드 외에
+                              <HighlightCode>+timestamp</HighlightCode> 필드를 추가하여 시간 부분을
+                              별도 처리하세요.
+                            </SolutionSteps>
+                          </SolutionText>
+                        </WarningContent>
+                      </Accordion>
+                    </CompactWarningBox>
+                  )}
+
                   {/* DndContext : 드래그·드롭 기능의 최상위 컨텍스트. */}
                   {/* collisionDetection={closestCenter}: 드래그 중인 아이템과 다른 아이템 간 충돌 판정을, 리스트 아이템의 중앙을 기준으로 계산하도록 설정. */}
                   {/* onDragEnd={handleDragEnd}: 드래그가 끝나고 손을 뗄 때 호출되는 콜백. */}

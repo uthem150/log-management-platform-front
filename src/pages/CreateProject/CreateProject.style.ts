@@ -384,3 +384,86 @@ export const InfoText = styled.p`
   line-height: 1.5;
   margin: 0;
 `;
+export const CompactWarningBox = styled.div`
+  /* background: ${colors.warningLight}; */
+  border: 1px solid ${colors.warningBorder};
+  border-radius: 8px;
+  margin: 1rem 0;
+`;
+
+export const WarningContent = styled.div`
+  padding: 0 1rem 1rem 1rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+`;
+
+export const WarningText = styled.p`
+  color: ${colors.warningText};
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0 0 1rem 0;
+`;
+
+export const ExampleRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin: 0.75rem 0;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+`;
+
+export const ExampleItem = styled.div<{ type: "good" | "bad" }>`
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: ${props => (props.type === "good" ? colors.successLight : colors.errorLight)};
+  border-left: 3px solid ${props => (props.type === "good" ? colors.success : colors.error)};
+`;
+
+export const ExampleLabel = styled.div<{ type: "good" | "bad" }>`
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: ${props => (props.type === "good" ? colors.successText : colors.errorText)};
+  margin-bottom: 0.25rem;
+`;
+
+export const ExampleCode = styled.code`
+  font-family: "SF Mono", "Monaco", "Inconsolata", monospace;
+  font-size: 0.8rem;
+  color: ${colors.darkGray};
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+`;
+
+export const SolutionText = styled.div`
+  background: ${colors.infoLight};
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+  border-left: 3px solid ${colors.primary};
+`;
+
+export const SolutionTitle = styled.div`
+  font-weight: 600;
+  color: ${colors.primary};
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+`;
+
+export const SolutionSteps = styled.div`
+  font-size: 0.8rem;
+  color: ${colors.secondary};
+  line-height: 1.4;
+`;
+
+export const HighlightCode = styled.code`
+  background: ${colors.primary};
+  color: ${colors.white};
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  font-weight: 500;
+  font-size: 0.75rem;
+`;
