@@ -544,7 +544,7 @@ const Layout = () => {
 
       {/* 푸터: 고정 메시지 */}
       <Footer>
-        <p>© 2025 My App. All rights reserved.</p>
+        <p>© 2025 Log Central. All rights reserved.</p>
       </Footer>
     </Container>
   );

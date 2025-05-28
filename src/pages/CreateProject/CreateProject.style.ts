@@ -69,6 +69,10 @@ export const Step = styled.div<{ active: boolean; completed: boolean }>`
   &:last-child {
     margin-right: 0;
   }
+
+  @media (max-width: 640px) {
+    font-size: 0.8rem;
+  }
 `;
 
 export const StepNumber = styled.span`
