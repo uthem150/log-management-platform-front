@@ -118,6 +118,7 @@ interface Field {
   id: string;
   name: string;
   path: string;
+  isDefault?: boolean; // 기본 필드 여부 추가
 }
 
 // 기본 필드 상수 정의
@@ -134,7 +135,7 @@ function SortableField({
   onFieldChange,
   onRemoveField
 }: {
-  field: { id: string; name: string; path: string };
+  field: Field;
   logType: "json" | "plainText" | "csv" | "xml";
   timestampMode: "single" | "separated";
   onFieldChange: (id: string, key: "name" | "path", value: string) => void;
@@ -157,9 +158,7 @@ function SortableField({
   };
 
   // 기본 필드인지 체크
-  const currentDefaultFields =
-    timestampMode === "single" ? DEFAULT_FIELDS.single : DEFAULT_FIELDS.separated;
-  const isDefaultField = currentDefaultFields.includes(field.name);
+  const isDefaultField = field.isDefault || false;
 
   return (
     // setNodeRef로 이 컨테이너를 dnd‑kit이 제어하는 노드로 등록
@@ -253,15 +252,16 @@ const CreateProject = () => {
   const [timestampMode, setTimestampMode] = useState<"single" | "separated">("single");
 
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    getValues
+    register, // 입력 필드를 폼에 등록
+    handleSubmit, // 폼 제출 핸들러를 만드는 고차 함수
+    formState: { errors }, // 유효성 검사 에러
+    watch, // 실시간으로 값 감시
+    getValues // 현재 폼 값들 가져오기
   } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     mode: "onChange" // 입력 시 실시간 유효성 검사
   });
+
   const { isAuthenticated, token, user } = useAuthStore(); // token, user 추가
 
   // 인증 상태 디버깅
@@ -278,7 +278,43 @@ const CreateProject = () => {
   const projectName = watch("name");
 
   // 다음 단계로 이동
-  const handleNextStep = () => {
+  const handleNextStep = (e?: React.FormEvent) => {
+    // 폼 제출 이벤트가 있다면 기본 동작 방지
+    if (e) {
+      e.preventDefault();
+    }
+
+    // 3단계에서 4단계로 넘어갈 때 필드 유효성 검사
+    if (currentStep === 3) {
+      // 필드명 중복 검사
+      const fieldNames = fields.map(field => field.name).filter(name => name.trim() !== "");
+      const duplicateNames = fieldNames.filter((name, index) => fieldNames.indexOf(name) !== index);
+
+      if (duplicateNames.length > 0) {
+        alert(`중복된 필드명이 있습니다: ${duplicateNames.join(", ")}`);
+        return;
+      }
+
+      // 빈 필드명 검사
+      const emptyFields = fields.filter(field => !field.name.trim());
+      if (emptyFields.length > 0) {
+        alert("모든 필드에 이름을 입력해주세요.");
+        return;
+      }
+
+      // JSON 타입일 때 빈 경로 검사
+      if (logType === "json") {
+        const emptyPaths = fields.filter(field => !field.path.trim());
+        if (emptyPaths.length > 0) {
+          alert("JSON 타입에서는 모든 필드에 경로를 입력해주세요.");
+          return;
+        }
+      }
+
+      // 에러 초기화
+      setApiError(null);
+    }
+
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
@@ -304,9 +340,9 @@ const CreateProject = () => {
       ]);
     } else if (type === "plainText") {
       setFields([
-        { id: "1", name: "timestamp", path: "^\\d{4}-\\d{2}-\\d{2}" },
-        { id: "2", name: "level", path: "(DEBUG|INFO|WARN|ERROR)" },
-        { id: "3", name: "msg_detail", path: ".*$" }
+        { id: "1", name: "timestamp", path: "", isDefault: true },
+        { id: "2", name: "level", path: "", isDefault: true },
+        { id: "3", name: "msg_detail", path: "", isDefault: true }
       ]);
     } else {
       setFields([
@@ -327,9 +363,7 @@ const CreateProject = () => {
     setTimestampMode(mode);
 
     // 현재 필드에서 커스텀 필드 추출 (기본 필드가 아닌 것들)
-    const currentDefaultFields =
-      oldMode === "single" ? DEFAULT_FIELDS.single : DEFAULT_FIELDS.separated;
-    const customFields = fields.filter(field => !currentDefaultFields.includes(field.name));
+    const customFields = fields.filter(field => !field.isDefault); // isDefault로 구분
 
     // 새로운 기본 필드 설정
     const newDefaultFields = mode === "single" ? DEFAULT_FIELDS.single : DEFAULT_FIELDS.separated;
@@ -347,7 +381,8 @@ const CreateProject = () => {
               ? "\\d{2}:\\d{2}:\\d{2}"
               : name === "level"
                 ? "(DEBUG|INFO|WARN|ERROR)"
-                : ".*$"
+                : ".*$",
+      isDefault: true // 기본 필드로 표시
     }));
 
     // 커스텀 필드의 ID를 새로운 기본 필드 수 이후로 재조정
@@ -365,7 +400,8 @@ const CreateProject = () => {
     const newField: Field = {
       id: Date.now().toString(),
       name: "",
-      path: ""
+      path: "",
+      isDefault: false // 커스텀 필드로 설정
     };
     setFields([...fields, newField]);
   };
