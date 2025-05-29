@@ -334,6 +334,12 @@ export const HelperText = styled.div`
   line-height: 1.4;
 `;
 
+export const RadioInfoSubtitle = styled.p`
+  color: ${colors.gray};
+  font-size: 0.85rem;
+  line-height: 1.3rem;
+`;
+
 export const RadioOption = styled.label`
   display: flex;
   align-items: center;
@@ -348,6 +354,14 @@ export const RadioOption = styled.label`
 export const RadioInput = styled.input`
   margin: 0;
   cursor: pointer;
+`;
+
+export const RadioText = styled.p`
+  color: ${colors.black};
+  padding-left: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
 `;
 
 export const DragHandle = styled.div`
@@ -388,6 +402,7 @@ export const InfoText = styled.p`
   line-height: 1.5;
   margin: 0;
 `;
+
 export const CompactWarningBox = styled.div`
   /* background: ${colors.warningLight}; */
   border: 1px solid ${colors.warningBorder};

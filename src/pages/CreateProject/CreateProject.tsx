@@ -44,8 +44,10 @@ import {
   LogTypeButton,
   LogTypeSelector,
   OperatorSelect,
+  RadioInfoSubtitle,
   RadioInput,
   RadioOption,
+  RadioText,
   RemoveButton,
   SectionSubtitle,
   SectionTitle,
@@ -119,17 +121,22 @@ interface Field {
 }
 
 // 기본 필드 상수 정의
-const DEFAULT_FIELDS = ["timestamp", "level", "msg_detail"];
+const DEFAULT_FIELDS = {
+  single: ["timestamp", "level", "msg_detail"],
+  separated: ["date", "time", "level", "msg_detail"]
+};
 
 // SortableField 컴포넌트
 function SortableField({
   field,
   logType,
+  timestampMode,
   onFieldChange,
   onRemoveField
 }: {
   field: { id: string; name: string; path: string };
   logType: "json" | "plainText" | "csv" | "xml";
+  timestampMode: "single" | "separated";
   onFieldChange: (id: string, key: "name" | "path", value: string) => void;
   onRemoveField: (id: string) => void;
 }) {
@@ -150,7 +157,9 @@ function SortableField({
   };
 
   // 기본 필드인지 체크
-  const isDefaultField = DEFAULT_FIELDS.includes(field.name);
+  const currentDefaultFields =
+    timestampMode === "single" ? DEFAULT_FIELDS.single : DEFAULT_FIELDS.separated;
+  const isDefaultField = currentDefaultFields.includes(field.name);
 
   return (
     // setNodeRef로 이 컨테이너를 dnd‑kit이 제어하는 노드로 등록
@@ -241,6 +250,7 @@ const CreateProject = () => {
 
   const [platform, setPlatform] = useState<PlatformEnum>("linux");
   const [downloadUrl, setDownloadUrl] = useState<string>("");
+  const [timestampMode, setTimestampMode] = useState<"single" | "separated">("single");
 
   const {
     register,
@@ -307,6 +317,49 @@ const CreateProject = () => {
     }
   };
 
+  const handleTimestampModeChange = (mode: "single" | "separated") => {
+    // plainText가 아닌 경우 처리하지 않음
+    if (logType !== "plainText") {
+      return;
+    }
+
+    const oldMode = timestampMode; // 현재 모드를 저장
+    setTimestampMode(mode);
+
+    // 현재 필드에서 커스텀 필드 추출 (기본 필드가 아닌 것들)
+    const currentDefaultFields =
+      oldMode === "single" ? DEFAULT_FIELDS.single : DEFAULT_FIELDS.separated;
+    const customFields = fields.filter(field => !currentDefaultFields.includes(field.name));
+
+    // 새로운 기본 필드 설정
+    const newDefaultFields = mode === "single" ? DEFAULT_FIELDS.single : DEFAULT_FIELDS.separated;
+
+    // 새로운 기본 필드를 ID와 path와 함께 생성
+    const newDefaultFieldsWithData = newDefaultFields.map((name, index) => ({
+      id: (index + 1).toString(),
+      name,
+      path:
+        name === "timestamp"
+          ? "^\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}"
+          : name === "date"
+            ? "^\\d{4}-\\d{2}-\\d{2}"
+            : name === "time"
+              ? "\\d{2}:\\d{2}:\\d{2}"
+              : name === "level"
+                ? "(DEBUG|INFO|WARN|ERROR)"
+                : ".*$"
+    }));
+
+    // 커스텀 필드의 ID를 새로운 기본 필드 수 이후로 재조정
+    const adjustedCustomFields = customFields.map((field, index) => ({
+      ...field,
+      id: (newDefaultFields.length + index + 1).toString()
+    }));
+
+    // 새로운 기본 필드 + 기존 커스텀 필드 조합
+    setFields([...newDefaultFieldsWithData, ...adjustedCustomFields]);
+  };
+
   // 필드 추가
   const handleAddField = () => {
     const newField: Field = {
@@ -322,8 +375,11 @@ const CreateProject = () => {
     // 삭제하려는 필드 찾기
     const fieldToRemove = fields.find(field => field.id === id);
 
+    const currentDefaultFields =
+      timestampMode === "single" ? DEFAULT_FIELDS.single : DEFAULT_FIELDS.separated;
+
     // 기본 필드인 경우 삭제 방지
-    if (fieldToRemove && DEFAULT_FIELDS.includes(fieldToRemove.name)) {
+    if (fieldToRemove && currentDefaultFields.includes(fieldToRemove.name)) {
       alert(`${fieldToRemove.name}은(는) 기본 필드이므로 삭제할 수 없습니다.`);
       return;
     }
@@ -341,16 +397,6 @@ const CreateProject = () => {
 
   // 필드 업데이트
   const handleFieldChange = (id: string, key: keyof Field, value: string) => {
-    // 필드 이름 변경 시 기본 필드와 중복 체크
-    if (key === "name" && DEFAULT_FIELDS.includes(value)) {
-      // 이미 존재하는 기본 필드 이름인지 확인
-      const isDuplicate = fields.some(field => field.name === value && field.id !== id);
-      if (isDuplicate) {
-        alert(`${value}은(는) 기본 필드이므로 중복해서 사용할 수 없습니다.`);
-        return;
-      }
-    }
-
     setFields(fields.map(field => (field.id === id ? { ...field, [key]: value } : field)));
 
     // 필드 이름이 변경된 경우 필터 조건도 업데이트
@@ -750,41 +796,63 @@ const CreateProject = () => {
                 </InfoBox>
 
                 <Accordion title="필드 설정" defaultOpen={true}>
-                  {/* Plain Text 로그 타입일 때만 타임스탬프 경고 표시 */}
+                  {/* 타임스탬프 모드 선택 */}
                   {logType === "plainText" && (
                     <CompactWarningBox>
                       <Accordion
-                        title="⚠️ Plain Text 파싱 주의사항"
-                        defaultOpen={false}
+                        title="타임스탬프 형식 선택"
+                        defaultOpen={true}
                         icon="info"
                         noMargin={true}
                       >
-                        <WarningContent>
-                          <WarningText>
-                            공백이 포함된 타임스탬프는 별도 필드가 필요할 수 있습니다.
-                          </WarningText>
+                        <RadioInfoSubtitle>
+                          로그의 타임스탬프가 하나의 필드인지, 공백으로 날짜와 시간이 분리되어
+                          있는지 선택해주세요. <br />
+                          선택한 타임스탬프 형식에 맞게 정규식 패턴이 자동으로 설정됩니다.
+                        </RadioInfoSubtitle>
 
-                          <ExampleRow>
-                            <ExampleItem type="good">
-                              <ExampleLabel type="good">✓ 정상 인식</ExampleLabel>
-                              <ExampleCode>2025-05-2603:00:29,872</ExampleCode>
-                            </ExampleItem>
+                        <FieldContainer>
+                          <FieldRow>
+                            <RadioOption>
+                              <RadioInput
+                                type="radio"
+                                name="timestampMode"
+                                value="single"
+                                checked={timestampMode === "single"}
+                                onChange={() => handleTimestampModeChange("single")}
+                              />
+                              <RadioText>단일 타임스탬프 (timestamp)</RadioText>
+                            </RadioOption>
 
-                            <ExampleItem type="bad">
-                              <ExampleLabel type="bad">✗ 문제 발생</ExampleLabel>
-                              <ExampleCode>2025-05-26 03:00:29,872</ExampleCode>
-                            </ExampleItem>
-                          </ExampleRow>
+                            <RadioOption>
+                              <RadioInput
+                                type="radio"
+                                name="timestampMode"
+                                value="separated"
+                                checked={timestampMode === "separated"}
+                                onChange={() => handleTimestampModeChange("separated")}
+                              />
+                              <RadioText>분리된 날짜/시간 (date + time)</RadioText>
+                            </RadioOption>
+                          </FieldRow>
 
-                          <SolutionText>
-                            <SolutionTitle>💡 해결 방법</SolutionTitle>
-                            <SolutionSteps>
-                              공백 포함 시 <HighlightCode>timestamp</HighlightCode> 필드 외에
-                              <HighlightCode>+timestamp</HighlightCode> 필드를 추가하여 시간 부분을
-                              별도 처리하세요.
-                            </SolutionSteps>
-                          </SolutionText>
-                        </WarningContent>
+                          <ExampleBlock>
+                            <ExampleTitle>예시:</ExampleTitle>
+                            <ExampleContent>
+                              <ExampleLine highlight={timestampMode === "single"}>
+                                단일: 2025-05-26T03:00:29,872
+                              </ExampleLine>
+                              <ExampleLine highlight={timestampMode === "separated"}>
+                                분리: 2025-05-26 03:00:29,872
+                              </ExampleLine>
+                            </ExampleContent>
+                            <ExampleCaption>
+                              {timestampMode === "single"
+                                ? "하나의 timestamp 필드를 사용합니다."
+                                : "date와 time 필드를 각각 사용합니다."}
+                            </ExampleCaption>
+                          </ExampleBlock>
+                        </FieldContainer>
                       </Accordion>
                     </CompactWarningBox>
                   )}
@@ -807,6 +875,7 @@ const CreateProject = () => {
                           key={field.id}
                           field={field}
                           logType={logType}
+                          timestampMode={timestampMode}
                           onFieldChange={handleFieldChange}
                           onRemoveField={handleRemoveField}
                         />
