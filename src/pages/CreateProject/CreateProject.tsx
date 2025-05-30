@@ -359,7 +359,6 @@ const CreateProject = () => {
       return;
     }
 
-    const oldMode = timestampMode; // 현재 모드를 저장
     setTimestampMode(mode);
 
     // 현재 필드에서 커스텀 필드 추출 (기본 필드가 아닌 것들)
