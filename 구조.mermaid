@@ -1,0 +1,46 @@
+sequenceDiagram
+    box rgba(227, 242, 253, 0.5) 프론트엔드 (React)
+    participant User as 사용자
+    participant CreateProject as 프로젝트 생성
+    participant ProjectList as 프로젝트 목록
+    participant PollingHook as 폴링 Hook
+    participant ProjectStore as 프로젝트 Store
+    participant ProjectAPI as API 클라이언트
+    end
+    
+    box rgba(254, 226, 226, 0.5) 백엔드 (Django)
+    participant Backend as 백엔드 API
+    end
+
+    User->>CreateProject: 1. 폼 작성 (4단계)
+    CreateProject->>CreateProject: 2. Zod 스키마 검증
+    CreateProject->>ProjectAPI: 3. POST /monitoring/log-project/step1
+    ProjectAPI->>Backend API: 4. 로그 파싱 설정 생성
+    Backend API-->>ProjectAPI: 5. project_id + download_url
+    ProjectAPI-->>CreateProject: 6. Step1 응답
+    CreateProject->>User: 7. 다운로드 가이드 표시
+    User->>CreateProject: 8. "대시보드 생성" 클릭
+    CreateProject->>ProjectAPI: 9. POST /monitoring/log-project/step2
+    ProjectAPI->>Backend API: 10. Grafana 대시보드 비동기 생성 시작
+    Backend API-->>ProjectAPI: 11. 202 Accepted
+    CreateProject->>ProjectList: 12. Navigate to /projects
+    ProjectList->>ProjectStore: 13. fetchProjects()
+    ProjectStore->>ProjectAPI: 14. GET /monitoring/projects/
+    ProjectAPI-->>ProjectStore: 15. 프로젝트 목록 (status: IN_PROGRESS)
+    ProjectStore-->>ProjectList: 16. projects 상태 업데이트
+    ProjectList->>PollingHook: 17. startPolling(projects)
+    
+    loop 5초마다
+        PollingHook->>ProjectAPI: 18. GET /monitoring/project/:id
+        ProjectAPI-->>PollingHook: 19. 프로젝트 상태 응답
+        PollingHook->>ProjectStore: 20. updateProjectStatus()
+        ProjectStore-->>ProjectList: 21. 상태 변경 알림
+        ProjectList->>User: 22. Toast UI 업데이트
+    end
+    
+    Note over Backend: 대시보드 생성 완료
+    PollingHook->>ProjectAPI: 23. GET /monitoring/project/:id
+    ProjectAPI-->>PollingHook: 24. status: READY
+    PollingHook->>ProjectStore: 25. updateProjectStatus(READY)
+    PollingHook->>PollingHook: 26. stopPolling()
+    ProjectList->>User: 27. "사용 가능" 상태 표시
